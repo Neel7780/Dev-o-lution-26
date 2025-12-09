@@ -34,13 +34,19 @@ export async function POST(req: Request) {
       <p><strong>Message:</strong><br/>${escapeHtml(data.message || "").replace(/\n/g, "<br/>")}</p>
     `
 
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: "dsc@dau.ac.in",
+      replyTo: data.email,
       subject: `Partner proposal — ${data.organization || "(unknown)"}`,
       html,
       text: `Partner proposal from ${data.organization || "(unknown)"}\n\n${data.message || ""}`,
     })
+
+    if (error) {
+      console.error("Resend error:", error)
+      return new Response(JSON.stringify({ error: "Failed to send email" }), { status: 502 })
+    }
 
     return new Response(JSON.stringify({ ok: true }), { status: 200 })
   } catch (err: any) {
