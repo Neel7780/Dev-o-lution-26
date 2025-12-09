@@ -37,53 +37,38 @@ const teamData = {
 
 export function OurTeam() {
   return (
-    <section id="our-team" className="py-20 px-4 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        {/* Decorative background pattern */}
-        <div className="absolute inset-0 -z-10 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `repeating-linear-gradient(
-              45deg,
-              transparent,
-              transparent 35px,
-              currentColor 35px,
-              currentColor 70px
-            )`,
-          }} />
-        </div>
-
+    <section id="our-team" className="py-12 px-4 relative overflow-hidden">
+      <div className="max-w-6xl mx-auto">
+        {/* Decorative background removed */}
         {/* Main content card */}
-        <div className="relative bg-linear-to-br from-red-300 via-red-400 to-pink-400 dark:from-red-400 dark:to-pink-500 rounded-2xl p-8 md:p-12 lg:p-16 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          {/* Mac-style window buttons */}
-          <div className="flex gap-2 mb-8">
-            <div className="w-4 h-4 rounded-full bg-red-500 border-2 border-black" />
-            <div className="w-4 h-4 rounded-full bg-yellow-400 border-2 border-black" />
-            <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-black" />
+        <div className="relative bg-linear-to-br from-red-300 via-red-400 to-pink-400 dark:from-red-400 dark:to-pink-500 rounded-2xl p-6 md:p-8 lg:p-10 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+          {/* Mac-style window buttons (positioned outside like other sections) */}
+          <div className="absolute -top-6 left-6 flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-red-500 border-2 border-black" />
+            <span className="w-3 h-3 rounded-full bg-yellow-400 border-2 border-black" />
+            <span className="w-3 h-3 rounded-full bg-green-500 border-2 border-black" />
           </div>
 
           {/* Heading */}
-          <h2 className="font-black text-3xl md:text-5xl lg:text-6xl font-black uppercase mb-12 text-black" style={{
+          <h2 className="font-black text-2xl md:text-3xl lg:text-4xl uppercase mb-8 text-black" style={{
             textShadow: '2px 2px 0px rgba(0,0,0,0.2)'
           }}>
             Our Team
           </h2>
 
           {/* Team Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {Object.entries(teamData).map(([teamName, members]) => (
               <div key={teamName} className="space-y-4">
                 {/* Team Name */}
-                <h3 className="font-bold text-xl md:text-2xl text-black mb-6">
+                <h3 className="font-bold text-lg md:text-xl text-black mb-4">
                   {teamName}
                 </h3>
                 
                 {/* Team Members */}
                 <ul className="space-y-3">
                   {members.map((member) => (
-                    <li 
-                      key={member}
-                      className="font-mono text-sm md:text-base text-black"
-                    >
+                    <li key={member} className="font-mono text-xs md:text-sm text-black">
                       {member}
                     </li>
                   ))}

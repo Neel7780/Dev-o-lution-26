@@ -13,12 +13,12 @@ export function MarqueeStrip() {
   ]
 
   return (
-    <div className="bg-yellow-400 border-y-[4px] border-black py-4 overflow-hidden">
+    <div className="bg-yellow-400 border-y-4 border-black py-4 overflow-hidden">
       <div className="animate-marquee flex whitespace-nowrap">
         {[...items, ...items, ...items, ...items].map((item, i) => (
           <span
             key={i}
-            className="font-[var(--font-display)] text-2xl md:text-3xl font-black uppercase mx-6 flex items-center gap-4 text-black"
+            className="font-(--font-display) text-2xl md:text-3xl uppercase mx-6 flex items-center gap-4 text-black"
           >
             <span>///</span>
             <span>{item}</span>
