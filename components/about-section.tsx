@@ -182,7 +182,7 @@ export function AboutSection() {
             className="font-(--font-display) text-4xl md:text-6xl uppercase mb-8 inline-block bg-black text-white px-4 py-2 rotate-1"
           >
             What is This?
-          </h2>
+          </motion.h2>
 
           <div ref={paragraphsRef} className="space-y-6 text-lg md:text-xl leading-relaxed text-black">
             <p>
