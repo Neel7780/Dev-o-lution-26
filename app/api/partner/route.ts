@@ -1,3 +1,5 @@
+import { Resend } from "resend"
+
 type PartnerForm = {
   organization?: string
   contactPerson?: string
@@ -10,33 +12,39 @@ export async function POST(req: Request) {
   try {
     const data: PartnerForm = await req.json()
 
-    // Basic validation
     if (!data.organization || !data.contactPerson || !data.email || !data.message) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400 })
     }
 
-    // Free path: forward submission to FormSubmit (https://formsubmit.co)
-    const formUrl = `https://formsubmit.co/dsc@dau.ac.in`
-    const params = new URLSearchParams()
-    params.append("Organization", data.organization || "")
-    params.append("Contact Person", data.contactPerson || "")
-    params.append("Email", data.email || "")
-    params.append("Phone", data.phone || "")
-    params.append("Message", data.message || "")
+    const RESEND_KEY = process.env.RESEND_API_KEY
+    const FROM_EMAIL = process.env.FROM_EMAIL || "no-reply@dau.ac.in"
 
-    try {
-      const resp = await fetch(formUrl, { method: "POST", body: params })
-      if (!resp.ok) {
-        return new Response(JSON.stringify({ error: "Failed to forward via FormSubmit" }), { status: 502 })
-      }
-    } catch (e) {
-      console.error("FormSubmit forwarding error:", e)
-      return new Response(JSON.stringify({ error: "Failed to forward via FormSubmit" }), { status: 502 })
+    if (!RESEND_KEY) {
+      return new Response(JSON.stringify({ error: "Resend API key missing (RESEND_API_KEY)" }), { status: 500 })
     }
+
+    const resend = new Resend(RESEND_KEY)
+
+    const html = `
+      <h3>New Partner Proposal</h3>
+      <p><strong>Organization:</strong> ${escapeHtml(data.organization || "")}</p>
+      <p><strong>Contact Person:</strong> ${escapeHtml(data.contactPerson || "")}</p>
+      <p><strong>Email:</strong> ${escapeHtml(data.email || "")}</p>
+      <p><strong>Phone:</strong> ${escapeHtml(data.phone || "")}</p>
+      <p><strong>Message:</strong><br/>${escapeHtml(data.message || "").replace(/\n/g, "<br/>")}</p>
+    `
+
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: "dsc@dau.ac.in",
+      subject: `Partner proposal — ${data.organization || "(unknown)"}`,
+      html,
+      text: `Partner proposal from ${data.organization || "(unknown)"}\n\n${data.message || ""}`,
+    })
 
     return new Response(JSON.stringify({ ok: true }), { status: 200 })
   } catch (err: any) {
-    console.error("Partner API error:", err)
+    console.error("Resend send error:", err)
     return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 })
   }
 }

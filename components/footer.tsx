@@ -3,15 +3,16 @@
 import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { Twitter, Linkedin, Instagram, Mail, Phone } from "lucide-react"
-import { GDGLogoSimple } from "./gdg-logo"
+import { motion } from "framer-motion"
+import { Twitter, Linkedin, Instagram, Mail, Phone, Github } from "lucide-react"
 
 gsap.registerPlugin(ScrollTrigger)
 
 const socialLinks = [
-  { icon: Twitter, label: "Twitter/X", href: "#" },
-  { icon: Linkedin, label: "LinkedIn", href: "#" },
-  { icon: Instagram, label: "Instagram", href: "#" },
+  { icon: Twitter, label: "Twitter/X", href: "x.com/gdgdaiict.com" },
+  { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/gdg-on-campus-daiict/" },
+  { icon: Instagram, label: "Instagram", href: "https://www.instagram.com/gdg.daiict/" },
+  { icon: Github, label: "GitHub", href: "https://github.com/ossdaiict" }
 ]
 
 export function Footer() {
@@ -90,12 +91,9 @@ export function Footer() {
           {/* Left Column */}
           <div>
             <div ref={titleRef} className="mb-6">
-              <div className="flex items-center gap-3 mb-4">
-                <GDGLogoSimple size={48} />
-                <h3 className="font-(--font-display) text-3xl md:text-4xl font-black uppercase">
-                  <span className="text-yellow-400">DEVOLUTION</span> 2026
-                </h3>
-              </div>
+              <h3 className="font-[var(--font-display)] text-3xl md:text-4xl font-black uppercase mb-4">
+                <span className="text-yellow-400">DEVOLUTION</span> 2026
+              </h3>
               <p className="text-white/80 text-lg">by GDG DAU</p>
             </div>
 
@@ -111,6 +109,7 @@ export function Footer() {
                   href={social.href}
                   className="bg-white text-black border-[3px] border-white p-3 brutal-shadow hover:bg-yellow-400 hover:-translate-y-1 transition-all duration-300"
                   aria-label={social.label}
+                  data-magnetic="0.3"
                 >
                   <social.icon className="w-6 h-6" />
                 </a>
@@ -123,18 +122,18 @@ export function Footer() {
             ref={contactCardRef}
             className="relative bg-yellow-400 text-black border-[3px] border-black p-6 brutal-shadow-lg max-w-sm ml-auto"
           >
-            <h4 className="font-(--font-display) text-xl font-black uppercase mb-4 border-b-2 border-black pb-2">
+            <h4 className="font-[var(--font-display)] text-xl font-black uppercase mb-4 border-b-2 border-black pb-2">
               📌 Contact Us
             </h4>
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5" />
-                <span className="font-medium">hello@gdgdau-dummy.in</span>
+                <span className="font-medium">dsc@dau.ac.in</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5" />
-                <span className="font-medium">+91 999-000-DUMMY</span>
+                <span className="font-medium">+91 8238722211</span>
               </div>
             </div>
 
