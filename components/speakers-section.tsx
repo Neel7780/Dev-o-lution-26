@@ -16,7 +16,7 @@ export function SpeakersSection() {
           className="text-center mb-12"
         >
           <h2 className="font-[var(--font-display)] text-5xl md:text-7xl font-black uppercase inline-block">
-            <span className="bg-orange-400 text-black px-4 py-2 border-[3px] border-black brutal-shadow rotate-[-1deg] inline-block">
+            <span className="bg-orange-400 text-black px-4 py-2 border-[3px] border-black brutal-shadow -rotate-1 inline-block">
               The Lineup
             </span>
           </h2>
@@ -50,7 +50,7 @@ export function SpeakersSection() {
               className="bg-white border-[3px] border-black p-3 brutal-shadow-lg"
               style={{ transform: `rotate(${(index - 1.5) * 2}deg)` }}
             >
-              <div className="aspect-square bg-black/10 border-[2px] border-black flex flex-col items-center justify-center mb-3">
+              <div className="aspect-square bg-black/10 border-2 border-black flex flex-col items-center justify-center mb-3">
                 <HelpCircle className="w-16 h-16 md:w-20 md:h-20 text-black/30 mb-2" />
                 <span className="font-bold text-black/40 text-sm uppercase">???</span>
               </div>

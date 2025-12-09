@@ -12,8 +12,8 @@ const tracks = [
     textColor: "text-black",
   },
   {
-    title: "Web3 & Decentralization",
-    description: "Build the decentralized future",
+    title: "Web3 & Blockchain",
+    description: "Build the web3 future and explore blockchain technology",
     icon: Link,
     color: "bg-yellow-400",
     textColor: "text-black",
@@ -40,8 +40,8 @@ const tracks = [
     textColor: "text-black",
   },
   {
-    title: "Security & Privacy",
-    description: "Protect and secure systems",
+    title: "Cyber Security",
+    description: "Protect and secure systems and data",
     icon: Shield,
     color: "bg-pink-400",
     textColor: "text-black",
@@ -58,7 +58,7 @@ export function TracksSection() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="font-[var(--font-display)] text-5xl md:text-7xl font-black uppercase inline-block">
+          <h2 className="font-[var(--font-display)] text-5xl md:text-7xl uppercase inline-block">
             <span className="bg-fuchsia-500 text-white px-4 py-2 border-[3px] border-black brutal-shadow rotate-[-1deg] inline-block">
               Event Tracks
             </span>

@@ -18,7 +18,6 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "DEVOLUTION 2026 | GDG DAU",
   description: "Devolution 2026 - Where Coding Meets Chaos & Creativity. GDG DAU's flagship tech conference.",
-    generator: 'v0.app'
 }
 
 export default function RootLayout({
