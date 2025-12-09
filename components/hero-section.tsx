@@ -148,10 +148,7 @@ export function HeroSection() {
           transition={{ duration: 0.6 }}
           className="inline-block mb-8"
         >
-          <div 
-            className="bg-violet-500 text-white border-[3px] border-black px-6 py-2 brutal-shadow rotate-[-2deg]"
-            data-magnetic="0.2"
-          >
+          <div className="bg-violet-500 text-white border-[3px] border-black px-6 py-2 brutal-shadow rotate-2">
             <span className="font-bold uppercase tracking-wider text-sm md:text-base">✦ Organized by GDG DAU ✦</span>
           </div>
         </motion.div>
@@ -161,7 +158,7 @@ export function HeroSection() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-[var(--font-display)] text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black uppercase leading-none mb-6 tracking-tighter will-change-transform"
+          className="font-(--font-display) text-6xl sm:text-7xl md:text-8xl lg:text-9xl uppercase leading-none mb-6 tracking-tighter"
           style={{
             WebkitTextStroke: "3px black",
             textShadow: "6px 6px 0px #000",
@@ -184,7 +181,7 @@ export function HeroSection() {
           <div className="absolute -top-3 left-8 w-16 h-6 bg-yellow-400/80 rotate-[-5deg] border border-black/20" />
           <div className="absolute -top-3 right-8 w-16 h-6 bg-yellow-400/80 rotate-[5deg] border border-black/20" />
 
-          <div className="bg-white border-[3px] border-black px-8 py-4 brutal-shadow rotate-[1deg]">
+          <div className="bg-white border-[3px] border-black px-8 py-4 brutal-shadow rotate-1">
             <p className="font-bold text-lg md:text-xl uppercase tracking-wide text-black">
               Where Coding Meets Chaos & Creativity
             </p>
@@ -200,12 +197,12 @@ export function HeroSection() {
         >
           <StampSticker rotation="-rotate-3" color="bg-orange-400">
             <span className="font-bold text-sm uppercase text-black">Date:</span>
-            <span className="font-[var(--font-display)] text-2xl md:text-3xl text-black">TBA 2026</span>
+            <span className="font-(--font-display) text-2xl md:text-3xl text-black">TBA 2026</span>
           </StampSticker>
 
           <StampSticker rotation="rotate-2" color="bg-cyan-400">
             <span className="font-bold text-sm uppercase text-black">Location:</span>
-            <span className="font-[var(--font-display)] text-2xl md:text-3xl text-black">DAU Campus</span>
+            <span className="font-(--font-display) text-2xl md:text-3xl text-black">DAU Campus</span>
           </StampSticker>
         </motion.div>
 
@@ -227,31 +224,7 @@ export function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
-      <motion.div 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2, duration: 0.6 }}
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-          className="flex flex-col items-center gap-2 text-black/60"
-        >
-          <span className="text-xs font-bold uppercase tracking-widest">Scroll</span>
-          <div className="w-6 h-10 border-2 border-black/40 rounded-full flex justify-center pt-2">
-            <motion.div
-              animate={{ y: [0, 12, 0], opacity: [1, 0.3, 1] }}
-              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-              className="w-1.5 h-3 bg-black/60 rounded-full"
-            />
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* Decorative dashed line */}
-      <div className="absolute bottom-24 left-0 w-full h-[2px] border-b-2 border-dashed border-black/20" />
+      <div className="absolute bottom-20 left-0 w-full h-0.5 border-b-2 border-dashed border-black/20" />
     </section>
   )
 }
