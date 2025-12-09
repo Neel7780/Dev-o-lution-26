@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { motion } from "framer-motion"
 import { Twitter, Linkedin, Instagram, Mail, Phone } from "lucide-react"
+import { GDGLogoSimple } from "./gdg-logo"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -16,106 +16,63 @@ const socialLinks = [
 
 export function Footer() {
   const footerRef = useRef<HTMLElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLDivElement>(null)
   const contactCardRef = useRef<HTMLDivElement>(null)
   const socialRef = useRef<HTMLDivElement>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (!footerRef.current) return
+
     const ctx = gsap.context(() => {
-      // Footer reveal from bottom
-      gsap.fromTo(
-        footerRef.current,
-        {
-          clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)",
+      // Smooth content reveal timeline
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: footerRef.current,
+          start: "top 85%",
         },
-        {
-          clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0 100%)",
-          duration: 1,
-          ease: "power3.inOut",
-          scrollTrigger: {
-            trigger: footerRef.current,
-            start: "top 90%",
-          },
-        }
-      )
+        defaults: { ease: "power2.out" }
+      })
 
-      // Title slide in
-      gsap.fromTo(
+      // Title and tagline fade in smoothly
+      tl.fromTo(
         titleRef.current,
-        {
-          x: -60,
-          opacity: 0,
-        },
-        {
-          x: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: footerRef.current,
-            start: "top 80%",
-          },
-        }
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.7 }
       )
 
-      // Contact card pop in with rotation
-      gsap.fromTo(
-        contactCardRef.current,
-        {
-          scale: 0.8,
-          opacity: 0,
-          rotation: 10,
-        },
-        {
-          scale: 1,
-          opacity: 1,
-          rotation: 2,
-          duration: 0.8,
-          ease: "back.out(1.7)",
-          scrollTrigger: {
-            trigger: footerRef.current,
-            start: "top 75%",
-          },
-        }
-      )
-
-      // Social icons stagger
-      const socialIcons = socialRef.current?.children
-      if (socialIcons) {
-        gsap.fromTo(
+      // Social icons - smooth stagger
+      if (socialRef.current) {
+        const socialIcons = socialRef.current.children
+        tl.fromTo(
           socialIcons,
-          {
-            y: 30,
-            opacity: 0,
-            scale: 0,
-          },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 0.5,
+          { y: 20, opacity: 0 },
+          { 
+            y: 0, 
+            opacity: 1, 
+            duration: 0.5, 
             stagger: 0.1,
-            ease: "back.out(2)",
-            scrollTrigger: {
-              trigger: socialRef.current,
-              start: "top 90%",
-            },
-          }
+          },
+          "-=0.4"
         )
       }
 
-      // Parallax for contact card on scroll
-      gsap.to(contactCardRef.current, {
-        y: -20,
-        rotation: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: footerRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 2,
-        },
-      })
+      // Contact card - slides in from right with subtle rotation
+      tl.fromTo(
+        contactCardRef.current,
+        { x: 40, opacity: 0, rotate: 5 },
+        { x: 0, opacity: 1, rotate: 2, duration: 0.7, ease: "power3.out" },
+        "-=0.5"
+      )
+
+      // Bottom bar fade in
+      tl.fromTo(
+        bottomRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5 },
+        "-=0.3"
+      )
 
     }, footerRef)
 
@@ -126,15 +83,19 @@ export function Footer() {
     <footer 
       ref={footerRef}
       id="contact" 
-      className="bg-black text-white border-t-[4px] border-black pt-16 pb-8 px-4"
+      className="bg-black text-white border-t-4 border-black pt-16 pb-8 px-4"
     >
-      <div className="max-w-6xl mx-auto">
+      <div ref={contentRef} className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 mb-12">
+          {/* Left Column */}
           <div>
             <div ref={titleRef} className="mb-6">
-              <h3 className="font-[var(--font-display)] text-3xl md:text-4xl font-black uppercase mb-4">
-                <span className="text-yellow-400">DEVOLUTION</span> 2026
-              </h3>
+              <div className="flex items-center gap-3 mb-4">
+                <GDGLogoSimple size={48} />
+                <h3 className="font-(--font-display) text-3xl md:text-4xl font-black uppercase">
+                  <span className="text-yellow-400">DEVOLUTION</span> 2026
+                </h3>
+              </div>
               <p className="text-white/80 text-lg">by GDG DAU</p>
             </div>
 
@@ -142,29 +103,27 @@ export function Footer() {
               Built with <span className="text-xl">💻</span> and <span className="text-xl">☕</span> at DAU
             </p>
 
+            {/* Social Links */}
             <div ref={socialRef} className="flex gap-4 mt-8">
               {socialLinks.map((social) => (
-                <motion.a
+                <a
                   key={social.label}
                   href={social.href}
-                  whileHover={{ scale: 1.1, rotate: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white text-black border-[3px] border-white p-3 brutal-shadow hover:bg-yellow-400 transition-colors"
+                  className="bg-white text-black border-[3px] border-white p-3 brutal-shadow hover:bg-yellow-400 hover:-translate-y-1 transition-all duration-300"
                   aria-label={social.label}
-                  data-magnetic="0.3"
                 >
                   <social.icon className="w-6 h-6" />
-                </motion.a>
+                </a>
               ))}
             </div>
           </div>
 
+          {/* Right Column - Contact Card */}
           <div
             ref={contactCardRef}
-            className="relative bg-yellow-400 text-black border-[3px] border-black p-6 brutal-shadow-lg max-w-sm ml-auto will-change-transform"
-            style={{ transformOrigin: "center center" }}
+            className="relative bg-yellow-400 text-black border-[3px] border-black p-6 brutal-shadow-lg max-w-sm ml-auto"
           >
-            <h4 className="font-[var(--font-display)] text-xl font-black uppercase mb-4 border-b-2 border-black pb-2">
+            <h4 className="font-(--font-display) text-xl font-black uppercase mb-4 border-b-2 border-black pb-2">
               📌 Contact Us
             </h4>
 
@@ -179,13 +138,23 @@ export function Footer() {
               </div>
             </div>
 
+            {/* Pin decoration */}
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-red-500 rounded-full border-2 border-red-700 shadow-lg" />
           </div>
         </div>
 
-        <div className="border-t-2 border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        {/* Bottom Bar */}
+        <div ref={bottomRef} className="border-t-2 border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/50 text-sm uppercase tracking-wide">© 2026 GDG DAU. All rights reserved.</p>
-          <p className="text-white/50 text-sm">Made with chaos & creativity</p>
+          
+          {/* Status Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-800/80 border border-zinc-700/50 backdrop-blur-sm">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+            </span>
+            <span className="text-sm text-zinc-300 font-medium">All systems online</span>
+          </div>
         </div>
       </div>
     </footer>
