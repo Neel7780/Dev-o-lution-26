@@ -1,0 +1,277 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@font-face {
+    font-family: "Aeonik Medium";
+    src: url("https://db.onlinewebfonts.com/t/757ff6da05e4f945c71c9751b485a9ad.eot");
+    src: url("https://db.onlinewebfonts.com/t/757ff6da05e4f945c71c9751b485a9ad.eot?#iefix")format("embedded-opentype"),
+        url("https://db.onlinewebfonts.com/t/757ff6da05e4f945c71c9751b485a9ad.woff2")format("woff2"),
+        url("https://db.onlinewebfonts.com/t/757ff6da05e4f945c71c9751b485a9ad.woff")format("woff"),
+        url("https://db.onlinewebfonts.com/t/757ff6da05e4f945c71c9751b485a9ad.ttf")format("truetype"),
+        url("https://db.onlinewebfonts.com/t/757ff6da05e4f945c71c9751b485a9ad.svg#Aeonik Medium")format("svg");
+}
+
+@font-face {
+    font-family: "Rampart One";
+    src: url("https://db.onlinewebfonts.com/t/32837c99f5807dfd6effb57ce38b5697.eot");
+    src: url("https://db.onlinewebfonts.com/t/32837c99f5807dfd6effb57ce38b5697.eot?#iefix")format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/32837c99f5807dfd6effb57ce38b5697.woff2")format("woff2"),
+    url("https://db.onlinewebfonts.com/t/32837c99f5807dfd6effb57ce38b5697.woff")format("woff"),
+    url("https://db.onlinewebfonts.com/t/32837c99f5807dfd6effb57ce38b5697.ttf")format("truetype"),
+    url("https://db.onlinewebfonts.com/t/32837c99f5807dfd6effb57ce38b5697.svg#Rampart One")format("svg");
+}
+
+.rampartfont{
+    font-family: "Rampart One";
+}
+
+.retro-text {
+    font-family: "Rampart One";
+}
+.myfont {
+    font-family: "Aeonik Medium";
+}
+
+body {
+    background-color: #f5e6d3;
+    overflow-x: hidden;
+}
+
+.shadow-neo {
+    box-shadow: 4px 4px 0px rgba(26, 26, 26, 1);
+}
+
+.shadow-neo-banner {
+    box-shadow: 2px 2px 0px rgba(26, 26, 26, 1);
+}
+
+.zigzag-bg {
+    background:
+        linear-gradient(135deg, #f5e6d3 25%, transparent 25%) -50px 0,
+        linear-gradient(225deg, #f5e6d3 25%, transparent 25%) -50px 0,
+        linear-gradient(315deg, #f5e6d3 25%, transparent 25%),
+        linear-gradient(45deg, #f5e6d3 25%, transparent 25%);
+    background-size: 100px 100px;
+    background-color: #ff6b6b;
+    animation: zigzag-move 10s linear infinite;
+}
+
+@keyframes zigzag-move {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 100px 100px;
+    }
+}
+
+.pc-window {
+    border: 4px solid #1a1a1a;
+    border-radius: 8px 8px 0 0;
+    position: relative;
+}
+
+.window-controls {
+    position: absolute;
+    top: -30px;
+    left: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.window-control {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #1a1a1a;
+}
+
+.window-close {
+    background-color: #ff6b6b;
+}
+
+.window-minimize {
+    background-color: #ffd700;
+}
+
+.window-maximize {
+    background-color: #4ecdc4;
+}
+
+.neo-box {
+    border: 4px solid #1a1a1a;
+    box-shadow: 8px 8px 0px #1a1a1a;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.neo-box:hover {
+    transform: translate(8px, 8px);
+    box-shadow: 0px 0px 0px #1a1a1a;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.float-animation {
+    animation: float 3s ease-in-out infinite;
+}
+
+.pulse-animation {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes glitch {
+    0% {
+        text-shadow: 0.05em 0 0 #00fffc, -0.05em -0.025em 0 #fc00ff,
+            0.025em 0.05em 0 #fffc00;
+    }
+
+    14% {
+        text-shadow: 0.05em 0 0 #00fffc, -0.05em -0.025em 0 #fc00ff,
+            0.025em 0.05em 0 #fffc00;
+    }
+
+    15% {
+        text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.025em 0 #fc00ff,
+            -0.05em -0.05em 0 #fffc00;
+    }
+
+    49% {
+        text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.025em 0 #fc00ff,
+            -0.05em -0.05em 0 #fffc00;
+    }
+
+    50% {
+        text-shadow: 0.025em 0.05em 0 #00fffc, 0.05em 0 0 #fc00ff,
+            0 -0.05em 0 #fffc00;
+    }
+
+    99% {
+        text-shadow: 0.025em 0.05em 0 #00fffc, 0.05em 0 0 #fc00ff,
+            0 -0.05em 0 #fffc00;
+    }
+
+    100% {
+        text-shadow: -0.025em 0 0 #00fffc, -0.025em -0.025em 0 #fc00ff,
+            -0.025em -0.05em 0 #fffc00;
+    }
+}
+
+.glitch {
+    animation: glitch 1s linear infinite;
+}
+
+@keyframes typewriter {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+.typewriter {
+    overflow: hidden;
+    border-right: 0.15em solid #1a1a1a;
+    white-space: nowrap;
+    margin: 0 auto;
+    letter-spacing: 0.15em;
+    animation:
+        typewriter 4s steps(40, end) 1s 1 normal both,
+        blink-caret 0.75s step-end infinite;
+}
+
+@keyframes blink-caret {
+
+    from,
+    to {
+        border-color: transparent;
+    }
+
+    50% {
+        border-color: #1a1a1a;
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.rotate-animation {
+    animation: rotate 10s linear infinite;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.slide-in-animation {
+    animation: slide-in 0.5s ease-out;
+}
+
+.hover-lift {
+    transition: transform 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f5e6d3;
+    border: 2px solid #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ff6b6b;
+    border: 2px solid #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4ecdc4;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .text-6xl {
+        font-size: 3rem;
+    }
+
+    .text-4xl {
+        font-size: 2.5rem;
+    }
+}
