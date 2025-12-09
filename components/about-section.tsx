@@ -15,14 +15,14 @@ export function AboutSection() {
           transition={{ duration: 0.6 }}
           className="relative bg-white border-[3px] border-black brutal-shadow-lg p-8 md:p-12 torn-paper-top torn-paper-bottom"
         >
-          <div className="absolute -top-2 left-1/4 w-20 h-8 bg-yellow-400/80 rotate-[-3deg] border border-black/20" />
-          <div className="absolute -top-2 right-1/4 w-20 h-8 bg-cyan-400/80 rotate-[3deg] border border-black/20" />
+          <div className="absolute -top-2 left-1/4 w-20 h-8 bg-yellow-400/80 rotate-3 border border-black/20" />
+          <div className="absolute -top-2 right-1/4 w-20 h-8 bg-cyan-400/80 rotate-3 border border-black/20" />
 
           <motion.h2
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="font-[var(--font-display)] text-4xl md:text-6xl font-black uppercase mb-8 inline-block bg-black text-white px-4 py-2 rotate-[-1deg]"
+            className="font-(--font-display) text-4xl md:text-6xl uppercase mb-8 inline-block bg-black text-white px-4 py-2 rotate-1"
           >
             What is This?
           </motion.h2>
