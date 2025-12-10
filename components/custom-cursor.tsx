@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import { gsap } from "gsap"
 
 export function CustomCursor() {
@@ -11,6 +11,12 @@ export function CustomCursor() {
   const [isClicking, setIsClicking] = useState(false)
   const [isMagnetic, setIsMagnetic] = useState(false)
   const [isOnDark, setIsOnDark] = useState(false)
+  const interactiveElementsRef = useRef<Set<Element>>(new Set())
+  const animationFrameRef = useRef<number | null>(null)
+  const mouseXRef = useRef(0)
+  const mouseYRef = useRef(0)
+  const cursorXRef = useRef(0)
+  const cursorYRef = useRef(0)
 
   useEffect(() => {
     // Only show custom cursor on desktop
@@ -22,11 +28,6 @@ export function CustomCursor() {
 
     if (!cursor || !dot || !ring) return
 
-    let mouseX = 0
-    let mouseY = 0
-    let cursorX = 0
-    let cursorY = 0
-
     // Check if element or its parents have dark background
     const isOverDarkSection = (element: Element | null): boolean => {
       if (!element) return false
@@ -34,15 +35,17 @@ export function CustomCursor() {
       // Check for data attribute
       if (element.closest('[data-cursor-light]')) return true
       
-      // Check for common dark background classes
+      // Check for common dark background classes (limit depth for performance)
       const darkClasses = ['bg-black', 'bg-zinc-900', 'bg-gray-900', 'bg-slate-900']
       let current: Element | null = element
+      let depth = 0
       
-      while (current) {
+      while (current && depth < 5) {
         if (darkClasses.some(cls => current?.classList.contains(cls))) {
           return true
         }
         current = current.parentElement
+        depth++
       }
       
       return false
@@ -50,28 +53,28 @@ export function CustomCursor() {
 
     // Smooth cursor following with GSAP
     const updateCursor = () => {
-      const diffX = mouseX - cursorX
-      const diffY = mouseY - cursorY
+      const diffX = mouseXRef.current - cursorXRef.current
+      const diffY = mouseYRef.current - cursorYRef.current
 
-      cursorX += diffX * 0.15
-      cursorY += diffY * 0.15
+      cursorXRef.current += diffX * 0.15
+      cursorYRef.current += diffY * 0.15
 
       gsap.set(ring, {
-        x: cursorX,
-        y: cursorY,
+        x: cursorXRef.current,
+        y: cursorYRef.current,
       })
 
       gsap.set(dot, {
-        x: mouseX,
-        y: mouseY,
+        x: mouseXRef.current,
+        y: mouseYRef.current,
       })
 
-      requestAnimationFrame(updateCursor)
+      animationFrameRef.current = requestAnimationFrame(updateCursor)
     }
 
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX
-      mouseY = e.clientY
+      mouseXRef.current = e.clientX
+      mouseYRef.current = e.clientY
 
       // Check if over dark section
       const target = e.target as HTMLElement
@@ -128,6 +131,8 @@ export function CustomCursor() {
           gsap.to(el, {
             x: 0,
             y: 0,
+            rotation: 0,
+            scale: 1,
             duration: 0.5,
             ease: "elastic.out(1, 0.3)",
           })
@@ -189,11 +194,13 @@ export function CustomCursor() {
     document.addEventListener("mousedown", handleMouseDown)
     document.addEventListener("mouseup", handleMouseUp)
 
-    // Track interactive elements
+    // Track interactive elements - cache in set
     const interactiveElements = document.querySelectorAll(
       'a, button, [role="button"], input, textarea, select, [data-cursor="hover"]'
     )
+    
     interactiveElements.forEach((el) => {
+      interactiveElementsRef.current.add(el)
       el.addEventListener("mouseenter", handleMouseEnterInteractive)
       el.addEventListener("mouseleave", handleMouseLeaveInteractive)
     })
@@ -212,10 +219,18 @@ export function CustomCursor() {
       document.removeEventListener("mousemove", handleMouseMove)
       document.removeEventListener("mousedown", handleMouseDown)
       document.removeEventListener("mouseup", handleMouseUp)
-      interactiveElements.forEach((el) => {
+      
+      // Clean up event listeners from cached elements
+      interactiveElementsRef.current.forEach((el) => {
         el.removeEventListener("mouseenter", handleMouseEnterInteractive)
         el.removeEventListener("mouseleave", handleMouseLeaveInteractive)
       })
+      
+      interactiveElementsRef.current.clear()
+      
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
     }
   }, [isHovering, isMagnetic, isOnDark])
 
@@ -225,7 +240,7 @@ export function CustomCursor() {
   }
 
   return (
-    <div ref={cursorRef} className="pointer-events-none fixed inset-0 z-[9999] hidden lg:block">
+    <div ref={cursorRef} className="pointer-events-none fixed inset-0 z-9999 hidden lg:block">
       {/* Main cursor dot */}
       <div
         ref={cursorDotRef}
