@@ -25,10 +25,16 @@ export function HeroSection() {
   useEffect(() => {
     if (!sectionRef.current) return
 
-    const isMobile = window.innerWidth < 768
     const { isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
-    
-    const ctx = gsap.context(() => {
+
+    const mm = gsap.matchMedia()
+
+    mm.add({
+      isMobile: "(max-width: 767px)",
+      isDesktop: "(min-width: 768px)",
+    }, (context) => {
+      const { isMobile } = context.conditions as { isMobile: boolean }
+
       // Master timeline for orchestrated entrance
       const masterTL = gsap.timeline({
         defaults: { ease: "power3.out" }
@@ -63,14 +69,14 @@ export function HeroSection() {
 
       if (devoChars.length && lutionChars.length && yearRef.current) {
         // DEVO - characters flip in from bottom (no 3D on mobile)
-        const fromState = isLowEndDevice || isMobile 
+        const fromState = isLowEndDevice || isMobile
           ? { y: 60, opacity: 0, scale: 0.8 }
           : { y: 120, opacity: 0, rotateX: -90, scale: 0.5, transformOrigin: "bottom center" }
-        
+
         const toState = isLowEndDevice || isMobile
           ? { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.05, ease: "power2.out" }
           : { y: 0, opacity: 1, rotateX: 0, scale: 1, duration: 0.8, stagger: 0.08, ease: "back.out(1.7)" }
-        
+
         masterTL.fromTo(
           devoChars,
           fromState,
@@ -82,11 +88,11 @@ export function HeroSection() {
         const lutionFrom = isLowEndDevice || isMobile
           ? { y: 60, opacity: 0, scale: 0.8 }
           : { y: 120, opacity: 0, rotateX: -90, scale: 0.5, transformOrigin: "bottom center" }
-        
+
         const lutionTo = isLowEndDevice || isMobile
           ? { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.04, ease: "power2.out" }
           : { y: 0, opacity: 1, rotateX: 0, scale: 1, duration: 0.8, stagger: 0.06, ease: "back.out(1.7)" }
-        
+
         masterTL.fromTo(
           lutionChars,
           lutionFrom,
@@ -102,7 +108,7 @@ export function HeroSection() {
             stagger: 0.03,
             ease: "power2.out",
           }, "-=0.2")
-          
+
           masterTL.to([...devoChars, ...lutionChars], {
             y: 0,
             duration: 0.4,
@@ -115,12 +121,12 @@ export function HeroSection() {
         masterTL.fromTo(
           yearRef.current,
           { scale: 0, opacity: 0, y: 40, rotateX: -45 },
-          { 
-            scale: 1, 
-            opacity: 1, 
+          {
+            scale: 1,
+            opacity: 1,
             y: 0,
             rotateX: 0,
-            duration: 1, 
+            duration: 1,
             ease: "elastic.out(1, 0.5)",
           },
           "-=0.8"
@@ -130,19 +136,19 @@ export function HeroSection() {
       // Subtitle card - 3D flip in
       masterTL.fromTo(
         subtitleRef.current,
-        { 
-          rotateX: -90, 
-          opacity: 0, 
+        {
+          rotateX: -90,
+          opacity: 0,
           y: -20,
           transformOrigin: "top center"
         },
-        { 
-          rotateX: 0, 
-          opacity: 1, 
-          y: 0, 
-          rotate: 1, 
-          duration: 0.8, 
-          ease: "back.out(1.4)" 
+        {
+          rotateX: 0,
+          opacity: 1,
+          y: 0,
+          rotate: 1,
+          duration: 0.8,
+          ease: "back.out(1.4)"
         },
         "-=0.4"
       )
@@ -152,18 +158,18 @@ export function HeroSection() {
         const cards = dateCardsRef.current.children
         masterTL.fromTo(
           cards,
-          { 
-            y: 60, 
-            opacity: 0, 
+          {
+            y: 60,
+            opacity: 0,
             scale: 0.5,
             rotateZ: (i) => (i === 0 ? -15 : 15),
           },
-          { 
-            y: 0, 
-            opacity: 1, 
+          {
+            y: 0,
+            opacity: 1,
             scale: 1,
             rotateZ: (i) => (i === 0 ? -3 : 2),
-            duration: 0.7, 
+            duration: 0.7,
             stagger: 0.2,
             ease: "elastic.out(1, 0.5)"
           },
@@ -197,18 +203,18 @@ export function HeroSection() {
         stickers.forEach((sticker, index) => {
           masterTL.fromTo(
             sticker,
-            { 
-              scale: 0, 
-              opacity: 0, 
+            {
+              scale: 0,
+              opacity: 0,
               rotation: isMobile ? 0 : -30 + Math.random() * 60,
               y: isMobile ? -50 : -100,
             },
-            { 
-              scale: 1, 
-              opacity: 1, 
-              rotation: 0, 
+            {
+              scale: 1,
+              opacity: 1,
+              rotation: 0,
               y: 0,
-              duration: isMobile ? 0.5 : 0.8, 
+              duration: isMobile ? 0.5 : 0.8,
               ease: isMobile ? "power2.out" : "bounce.out",
             },
             `-=${0.6 - index * 0.1}`
@@ -252,7 +258,7 @@ export function HeroSection() {
         shapes?.forEach((shape, index) => {
           const speed = 0.15 + (index * 0.1)
           const direction = index % 2 === 0 ? 1 : -1
-          
+
           gsap.to(shape, {
             y: 120 * speed * direction,
             x: 30 * speed * -direction,
@@ -279,14 +285,13 @@ export function HeroSection() {
           scrub: 2,
         },
       })
+    })
 
-    }, sectionRef)
-
-    return () => ctx.revert()
+    return () => mm.revert()
   }, [])
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative min-h-screen pt-24 md:pt-32 pb-16 px-4 overflow-hidden"
       style={{ perspective: "1200px" }}
@@ -306,19 +311,19 @@ export function HeroSection() {
           <Sparkles className="w-6 h-6 text-black" />
         </FloatingSticker>
       </div>
-      
+
       <div className="parallax-shape absolute top-32 right-[8%] hidden md:block">
         <FloatingSticker className="-rotate-6" color="bg-yellow-400">
           <Zap className="w-6 h-6 text-black" />
         </FloatingSticker>
       </div>
-      
+
       <div className="parallax-shape absolute bottom-40 left-[10%] hidden md:block">
         <FloatingSticker className="rotate-6" color="bg-lime-400">
           <Star className="w-6 h-6 text-black" />
         </FloatingSticker>
       </div>
-      
+
       <div className="parallax-shape absolute top-48 left-[15%] hidden lg:block">
         <FloatingSticker className="-rotate-12" color="bg-pink-400">
           <Cloud className="w-6 h-6 text-black" />
@@ -338,7 +343,7 @@ export function HeroSection() {
       </div>
 
       {/* Grid pattern overlay for texture */}
-      <div 
+      <div
         className="absolute inset-0 -z-10 opacity-[0.02] pointer-events-none"
         style={{
           backgroundImage: `
@@ -386,7 +391,7 @@ export function HeroSection() {
                   key={`devo-${index}`}
                   ref={(el) => { devoCharsRef.current[index] = el }}
                   className="inline-block hover:scale-110 hover:-translate-y-2 transition-transform duration-200 cursor-default"
-                  style={{ 
+                  style={{
                     color: gdgColors[index % 4],
                     willChange: "transform, opacity",
                     transformStyle: "preserve-3d",
@@ -406,7 +411,7 @@ export function HeroSection() {
                   key={`lution-${index}`}
                   ref={(el) => { lutionCharsRef.current[index] = el }}
                   className="inline-block hover:scale-110 hover:-translate-y-2 transition-transform duration-200 cursor-default"
-                  style={{ 
+                  style={{
                     color: gdgColors[(index + 4) % 4], // Continue pattern
                     willChange: "transform, opacity",
                     transformStyle: "preserve-3d",
@@ -418,14 +423,14 @@ export function HeroSection() {
             })}
           </span>
           <br />
-          <span 
-            ref={yearRef} 
+          <span
+            ref={yearRef}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white inline-block relative"
             style={{ transformStyle: "preserve-3d" }}
           >
             2026
             {/* Year underline animation - gradient with all GDG colors */}
-            <span 
+            <span
               className="absolute -bottom-2 left-0 w-0 h-1 animate-[expand_0.5s_ease-out_2s_forwards]"
               style={{ background: "linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853)" }}
             />

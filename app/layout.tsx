@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${archivoBlack.variable} ${spaceGrotesk.variable} font-sans antialiased cursor-none lg:cursor-none`}>
+      <body className={`${archivoBlack.variable} ${spaceGrotesk.variable} font-sans antialiased cursor-auto lg:cursor-none`}>
         <CustomCursor />
         <ScrollProgress />
         {children}
