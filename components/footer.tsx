@@ -85,7 +85,6 @@ export function Footer() {
       ref={footerRef}
       id="contact" 
       className="bg-black text-white border-t-4 border-black pt-16 pb-8 px-4"
-      data-cursor-light
     >
       <div ref={contentRef} className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 mb-12">
