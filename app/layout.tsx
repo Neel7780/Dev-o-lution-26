@@ -2,6 +2,8 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Archivo_Black, Space_Grotesk } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { CustomCursor } from "@/components/custom-cursor"
+import { ScrollProgress } from "@/components/scroll-progress"
 import "./globals.css"
 
 const archivoBlack = Archivo_Black({
@@ -27,7 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${archivoBlack.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
+      <body className={`${archivoBlack.variable} ${spaceGrotesk.variable} font-sans antialiased cursor-none lg:cursor-none`}>
+        <CustomCursor />
+        <ScrollProgress />
         {children}
         <Analytics />
       </body>

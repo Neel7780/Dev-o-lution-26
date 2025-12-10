@@ -1,0 +1,305 @@
+"use client"
+
+import { useEffect, useRef } from "react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
+gsap.registerPlugin(ScrollTrigger)
+
+// SVG blob paths for morphing
+const blobPaths = [
+  "M45.3,-58.9C57.9,-47.7,67.2,-32.6,70.9,-15.9C74.6,0.8,72.7,19.1,64.3,33.5C55.9,47.9,41.1,58.4,24.5,65.2C7.9,72,-10.6,75.1,-27.8,70.5C-45,65.9,-60.9,53.6,-70.4,37.3C-79.9,21,-83,-0.4,-78.1,-19.4C-73.2,-38.4,-60.4,-55,-44.6,-65.5C-28.8,-76,-14.4,-80.4,1.3,-82C17,-83.6,32.7,-70.1,45.3,-58.9Z",
+  "M43.2,-54.8C55.7,-44.3,65.2,-30.4,69.1,-14.7C73,1,71.4,18.5,63.8,32.7C56.2,46.9,42.7,57.8,27.4,64.1C12.1,70.4,-5,72.1,-21.4,68.4C-37.8,64.7,-53.5,55.6,-63.1,42.1C-72.7,28.6,-76.2,10.7,-73.1,-5.8C-70,-22.3,-60.3,-37.4,-47.3,-47.9C-34.3,-58.4,-17.2,-64.3,-0.4,-63.8C16.4,-63.3,30.7,-65.3,43.2,-54.8Z",
+  "M42.7,-53.8C54.9,-43.5,64,-29.5,68.5,-13.3C73,2.9,72.9,21.3,65.4,35.9C57.9,50.5,43,61.3,26.5,67.3C10,73.3,-8.1,74.5,-24.2,69.2C-40.3,63.9,-54.4,52.1,-63.4,37C-72.4,21.9,-76.3,3.4,-72.4,-12.6C-68.5,-28.7,-56.8,-42.4,-43.1,-52.5C-29.4,-62.6,-14.7,-69.1,0.7,-70C16.1,-70.9,30.5,-64.1,42.7,-53.8Z",
+  "M39.5,-49.4C51.7,-39.3,62.6,-27.3,67.3,-12.6C72,2.1,70.5,19.5,62.5,33.1C54.5,46.7,40,56.5,24.1,62.3C8.2,68.1,-9.1,69.9,-24.9,65.3C-40.7,60.7,-55,49.7,-63.8,35.2C-72.6,20.7,-75.9,2.8,-72.4,-13.4C-68.9,-29.6,-58.6,-44.1,-45.2,-54C-31.8,-63.9,-15.9,-69.2,-0.6,-68.5C14.7,-67.8,27.3,-59.5,39.5,-49.4Z",
+]
+
+export function MorphingBackground() {
+  const path1Ref = useRef<SVGPathElement>(null)
+  const path2Ref = useRef<SVGPathElement>(null)
+  const path3Ref = useRef<SVGPathElement>(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Morphing animation for each blob
+      const morphBlob = (pathRef: React.RefObject<SVGPathElement | null>, index: number) => {
+        if (!pathRef.current) return
+
+        const paths = [...blobPaths]
+        // Rotate the paths array based on index for variety
+        for (let i = 0; i < index; i++) {
+          paths.push(paths.shift()!)
+        }
+
+        gsap.to(pathRef.current, {
+          attr: { d: paths[1] },
+          duration: 4,
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
+          repeatDelay: 0.5,
+        })
+
+        // Add rotation
+        gsap.to(pathRef.current.parentElement, {
+          rotation: 360,
+          duration: 40 + index * 10,
+          ease: "none",
+          repeat: -1,
+        })
+
+        // Subtle scale pulsing
+        gsap.to(pathRef.current, {
+          scale: 1.1,
+          duration: 3 + index,
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
+        })
+      }
+
+      morphBlob(path1Ref, 0)
+      morphBlob(path2Ref, 1)
+      morphBlob(path3Ref, 2)
+
+      // Scroll-linked color shift
+      ScrollTrigger.create({
+        trigger: document.body,
+        start: "top top",
+        end: "bottom bottom",
+        onUpdate: (self) => {
+          const hue1 = gsap.utils.interpolate([48, 280, 180, 48], self.progress)
+          const hue2 = gsap.utils.interpolate([180, 48, 280, 180], self.progress)
+          const hue3 = gsap.utils.interpolate([280, 180, 48, 280], self.progress)
+
+          if (path1Ref.current) {
+            path1Ref.current.style.fill = `hsla(${hue1}, 80%, 60%, 0.15)`
+          }
+          if (path2Ref.current) {
+            path2Ref.current.style.fill = `hsla(${hue2}, 80%, 60%, 0.1)`
+          }
+          if (path3Ref.current) {
+            path3Ref.current.style.fill = `hsla(${hue3}, 80%, 60%, 0.08)`
+          }
+        },
+      })
+    })
+
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+      {/* Blob 1 - Top left */}
+      <svg
+        className="absolute -top-1/4 -left-1/4 w-[800px] h-[800px] opacity-60"
+        viewBox="-100 -100 200 200"
+      >
+        <g style={{ transformOrigin: "center" }}>
+          <path
+            ref={path1Ref}
+            d={blobPaths[0]}
+            fill="rgba(250, 204, 21, 0.15)"
+            style={{ filter: "blur(40px)" }}
+          />
+        </g>
+      </svg>
+
+      {/* Blob 2 - Bottom right */}
+      <svg
+        className="absolute -bottom-1/4 -right-1/4 w-[700px] h-[700px] opacity-50"
+        viewBox="-100 -100 200 200"
+      >
+        <g style={{ transformOrigin: "center" }}>
+          <path
+            ref={path2Ref}
+            d={blobPaths[1]}
+            fill="rgba(34, 211, 238, 0.1)"
+            style={{ filter: "blur(50px)" }}
+          />
+        </g>
+      </svg>
+
+      {/* Blob 3 - Center */}
+      <svg
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-40"
+        viewBox="-100 -100 200 200"
+      >
+        <g style={{ transformOrigin: "center" }}>
+          <path
+            ref={path3Ref}
+            d={blobPaths[2]}
+            fill="rgba(168, 85, 247, 0.08)"
+            style={{ filter: "blur(60px)" }}
+          />
+        </g>
+      </svg>
+    </div>
+  )
+}
+
+// Floating particles component
+export function FloatingParticles() {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const particles = containerRef.current.querySelectorAll(".particle")
+    
+    const ctx = gsap.context(() => {
+      particles.forEach((particle, index) => {
+        // Random starting position
+        gsap.set(particle, {
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+        })
+
+        // Floating animation
+        gsap.to(particle, {
+          y: `-=${100 + Math.random() * 200}`,
+          x: `+=${(Math.random() - 0.5) * 100}`,
+          opacity: 0,
+          duration: 5 + Math.random() * 5,
+          repeat: -1,
+          delay: index * 0.5,
+          ease: "none",
+          onRepeat: function() {
+            gsap.set(particle, {
+              y: window.innerHeight + 50,
+              x: Math.random() * window.innerWidth,
+              opacity: 1,
+            })
+          },
+        })
+
+        // Subtle rotation
+        gsap.to(particle, {
+          rotation: 360,
+          duration: 10 + Math.random() * 10,
+          repeat: -1,
+          ease: "none",
+        })
+      })
+
+      // Scroll-linked movement
+      ScrollTrigger.create({
+        trigger: document.body,
+        start: "top top",
+        end: "bottom bottom",
+        onUpdate: (self) => {
+          const velocity = self.getVelocity() / 1000
+          particles.forEach((particle) => {
+            gsap.to(particle, {
+              y: `-=${velocity * 2}`,
+              duration: 0.5,
+              ease: "power2.out",
+            })
+          })
+        },
+      })
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <div
+      ref={containerRef}
+      className="fixed inset-0 -z-5 pointer-events-none overflow-hidden"
+    >
+      {[...Array(20)].map((_, i) => (
+        <div
+          key={i}
+          className="particle absolute w-1 h-1 rounded-full"
+          style={{
+            background: [
+              "rgba(250, 204, 21, 0.6)",
+              "rgba(34, 211, 238, 0.6)",
+              "rgba(168, 85, 247, 0.6)",
+              "rgba(236, 72, 153, 0.6)",
+            ][i % 4],
+            boxShadow: `0 0 ${4 + i % 3 * 2}px currentColor`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Gradient mesh background
+export function GradientMesh() {
+  const meshRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!meshRef.current) return
+
+    const ctx = gsap.context(() => {
+      const gradients = meshRef.current!.querySelectorAll(".gradient-orb")
+
+      gradients.forEach((gradient, index) => {
+        // Floating motion
+        gsap.to(gradient, {
+          x: `random(-100, 100)`,
+          y: `random(-100, 100)`,
+          duration: `random(10, 20)`,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        })
+
+        // Scale pulsing
+        gsap.to(gradient, {
+          scale: `random(0.8, 1.2)`,
+          duration: `random(5, 10)`,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        })
+      })
+
+      // Color shift on scroll
+      ScrollTrigger.create({
+        trigger: document.body,
+        start: "top top",
+        end: "bottom bottom",
+        onUpdate: (self) => {
+          const progress = self.progress
+          const hueShift = progress * 60
+
+          gradients.forEach((gradient, index) => {
+            const baseHue = [48, 180, 280, 320][index % 4]
+            ;(gradient as HTMLElement).style.background = `radial-gradient(circle, hsla(${baseHue + hueShift}, 70%, 60%, 0.3) 0%, transparent 70%)`
+          })
+        },
+      })
+    }, meshRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <div
+      ref={meshRef}
+      className="fixed inset-0 -z-10 pointer-events-none overflow-hidden"
+    >
+      <div
+        className="gradient-orb absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(250, 204, 21, 0.3) 0%, transparent 70%)" }}
+      />
+      <div
+        className="gradient-orb absolute top-3/4 right-1/4 w-80 h-80 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%)" }}
+      />
+      <div
+        className="gradient-orb absolute top-1/2 left-1/2 w-72 h-72 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%)" }}
+      />
+      <div
+        className="gradient-orb absolute bottom-1/4 left-1/3 w-64 h-64 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%)" }}
+      />
+    </div>
+  )
+}
+
