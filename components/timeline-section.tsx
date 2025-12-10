@@ -55,15 +55,21 @@ export function TimelineSection() {
   useEffect(() => {
     if (!sectionRef.current || !timelineRef.current) return
 
-    const isMobile = window.innerWidth < 768
     const { isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
-    
-    const ctx = gsap.context(() => {
-      // Marquee animation (slower on mobile, skip on reduced motion)
-      if (marqueeRef.current && !prefersReducedMotion) {
+
+    const mm = gsap.matchMedia()
+
+    mm.add({
+      isMobile: "(max-width: 767px)",
+      isDesktop: "(min-width: 768px)",
+    }, (context) => {
+      const { isMobile } = context.conditions as { isMobile: boolean }
+
+      // Marquee animation (slower on mobile, skip on reduced motion/low-end)
+      if (marqueeRef.current && !prefersReducedMotion && !isLowEndDevice) {
         const marqueeWidth = marqueeRef.current.scrollWidth / 2
-        const duration = isLowEndDevice ? 25 : isMobile ? 20 : 15
-        
+        const duration = isMobile ? 30 : 15 // Much slower on mobile
+
         gsap.to(marqueeRef.current, {
           x: -marqueeWidth,
           ease: "none",
@@ -77,12 +83,12 @@ export function TimelineSection() {
         headingRef.current,
         {
           opacity: 0,
-          y: 30,
+          y: isMobile ? 20 : 30,
         },
         {
           opacity: 1,
           y: 0,
-          duration: 0.7,
+          duration: isMobile ? 0.5 : 0.7,
           ease: "power2.out",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -91,7 +97,7 @@ export function TimelineSection() {
         }
       )
 
-      // Animate the timeline line drawing
+      // Animate the timeline line drawing (simpler on mobile)
       gsap.fromTo(
         lineRef.current,
         {
@@ -105,7 +111,7 @@ export function TimelineSection() {
             trigger: timelineRef.current,
             start: "top 80%",
             end: "bottom 60%",
-            scrub: 0.5,
+            scrub: isMobile ? 1 : 0.5, // Less aggressive scrub on mobile
           },
         }
       )
@@ -117,12 +123,12 @@ export function TimelineSection() {
           item,
           {
             opacity: 0,
-            y: 30,
+            y: isMobile ? 20 : 30,
           },
           {
             opacity: 1,
             y: 0,
-            duration: 0.8,
+            duration: isMobile ? 0.5 : 0.8,
             ease: "power2.out",
             scrollTrigger: {
               trigger: item,
@@ -132,7 +138,7 @@ export function TimelineSection() {
           }
         )
 
-        // Dot fade in
+        // Dot fade in (simplified on mobile)
         const dot = item.querySelector(".timeline-dot")
         if (dot) {
           gsap.fromTo(
@@ -141,8 +147,8 @@ export function TimelineSection() {
             {
               opacity: 1,
               scale: 1,
-              duration: 0.4,
-              ease: "back.out(2)",
+              duration: isMobile ? 0.3 : 0.4,
+              ease: isMobile ? "power2.out" : "back.out(2)",
               scrollTrigger: {
                 trigger: item,
                 start: "top 90%",
@@ -151,7 +157,7 @@ export function TimelineSection() {
           )
         }
       })
-    }, sectionRef)
+    })
 
     const handleResize = () => {
       ScrollTrigger.refresh()
@@ -159,7 +165,7 @@ export function TimelineSection() {
     window.addEventListener("resize", handleResize)
 
     return () => {
-      ctx.revert()
+      mm.revert()
       window.removeEventListener("resize", handleResize)
     }
   }, [])

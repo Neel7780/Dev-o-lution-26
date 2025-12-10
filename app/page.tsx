@@ -13,29 +13,28 @@ import { JoinTheConversation } from "@/components/join-the-conversation"
 // Animated components
 import { HorizontalScrollSection } from "@/components/horizontal-scroll-section"
 import { VelocityScrollSection } from "@/components/scroll-velocity"
-import { MorphingBackground, FloatingParticles } from "@/components/morphing-background"
+import { DesktopOnlyBackgrounds } from "@/components/desktop-only-backgrounds"
 
 export default function Home() {
   return (
     <main className="min-h-screen overflow-x-hidden relative">
-      {/* Animated background elements */}
-      <MorphingBackground />
-      <FloatingParticles />
-      
+      {/* Animated background elements - desktop only for performance */}
+      <DesktopOnlyBackgrounds />
+
       <Navbar />
       <HeroSection />
       <MarqueeStrip />
       <AboutSection />
-      
+
       {/* Horizontal scroll tracks section */}
       <HorizontalScrollSection />
-      
+
       <TimelineSection />
       <SpeakersSection />
-      
+
       {/* Velocity-based scroll section */}
       <VelocityScrollSection />
-      
+
       <JoinTheConversation />
       <OurTeam />
       <PartnerWithUs />

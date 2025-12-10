@@ -37,7 +37,7 @@ export function ScrollVelocityText({
 
     const { isMobile, prefersReducedMotion } = getDeviceCapabilities()
     const rafInterval = getRAFInterval()
-    
+
     // Disable on reduced motion preference
     if (prefersReducedMotion) return
 
@@ -61,13 +61,13 @@ export function ScrollVelocityText({
 
     const animate = () => {
       frameCount++
-      
+
       // Limit frame rate on mobile devices
       if (frameCount % rafInterval !== 0) {
         animationFrameId = requestAnimationFrame(animate)
         return
       }
-      
+
       const now = performance.now()
       const deltaTime = (now - lastFrameTime) / 1000
 
@@ -147,7 +147,7 @@ export function SkewOnScroll({ children, className = "", maxSkew = 10 }: SkewOnS
         onUpdate: (self) => {
           const velocity = self.getVelocity()
           const skew = gsap.utils.clamp(-maxSkew, maxSkew, velocity / 300)
-          
+
           gsap.to(elementRef.current, {
             skewY: skew,
             duration: 0.5,
@@ -181,8 +181,34 @@ export function VelocityScrollSection() {
   useEffect(() => {
     if (!sectionRef.current) return
 
+    const isMobile = window.innerWidth < 768
+    const { prefersReducedMotion } = getDeviceCapabilities()
+
     const ctx = gsap.context(() => {
-      // Create velocity-based animations for each line
+      // On mobile: simple fade in, no velocity-based animations
+      if (isMobile || prefersReducedMotion) {
+        [line1Ref, line2Ref, line3Ref].forEach((ref, index) => {
+          if (!ref.current) return
+
+          gsap.fromTo(
+            ref.current,
+            { opacity: 0 },
+            {
+              opacity: 1,
+              duration: 0.8,
+              delay: index * 0.2,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 80%",
+              },
+            }
+          )
+        })
+        return
+      }
+
+      // Desktop: Full velocity-based animations
       [line1Ref, line2Ref, line3Ref].forEach((ref, index) => {
         if (!ref.current) return
 
@@ -199,11 +225,11 @@ export function VelocityScrollSection() {
           onUpdate: (self) => {
             const velocity = self.getVelocity()
             const progress = self.progress
-            
+
             // Calculate x position based on scroll progress and velocity
             const baseX = (progress - 0.5) * speed * direction
             const velocityInfluence = velocity / 500 * direction
-            
+
             gsap.to(ref.current, {
               x: baseX + velocityInfluence,
               duration: 0.5,
@@ -235,14 +261,14 @@ export function VelocityScrollSection() {
         >
           DEVOLUTION • DEVOLUTION • DEVOLUTION • DEVOLUTION •
         </div>
-        
+
         <div
           ref={line2Ref}
           className="font-(--font-display) text-6xl md:text-8xl lg:text-9xl text-white/5 uppercase whitespace-nowrap"
         >
           GDG DAU • GDG DAU • GDG DAU • GDG DAU • GDG DAU •
         </div>
-        
+
         <div
           ref={line3Ref}
           className="font-(--font-display) text-6xl md:text-8xl lg:text-9xl text-transparent uppercase whitespace-nowrap"
