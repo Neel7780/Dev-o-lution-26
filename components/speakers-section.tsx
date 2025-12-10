@@ -3,14 +3,11 @@
 import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { HelpCircle, Lock, Eye, EyeOff } from "lucide-react"
+import { HelpCircle, Lock } from "lucide-react"
 
 gsap.registerPlugin(ScrollTrigger)
 
 const speakers = [1, 2, 3, 4]
-
-// Glitch text characters for mystery effect
-const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`"
 
 export function SpeakersSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -18,28 +15,20 @@ export function SpeakersSection() {
   const badgeRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLParagraphElement>(null)
-  const glitchTextRefs = useRef<(HTMLSpanElement | null)[]>([])
 
   useEffect(() => {
     if (!sectionRef.current) return
 
-    const isMobile = window.innerWidth < 768
-
     const ctx = gsap.context(() => {
-      // Heading animation - dramatic reveal with clip path
+      // Heading animation - simple fade up
       gsap.fromTo(
         headingRef.current,
-        { 
-          y: 50, 
-          opacity: 0,
-          clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)",
-        },
+        { y: 30, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0 100%)",
-          duration: 1,
-          ease: "power3.out",
+          duration: 0.7,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 80%",
@@ -47,186 +36,72 @@ export function SpeakersSection() {
         }
       )
 
-      // Top secret badge - glitchy entrance
-      const badgeTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 75%",
-        },
-      })
+      // Top secret badge - pops in with bounce
+      gsap.fromTo(
+        badgeRef.current,
+        { scale: 0, opacity: 0, rotate: -20 },
+        {
+          scale: 1,
+          opacity: 1,
+          rotate: -12,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 75%",
+          },
+        }
+      )
 
-      badgeTl
-        .fromTo(
-          badgeRef.current,
-          { scale: 0, opacity: 0, rotate: 180 },
-          { scale: 1.2, opacity: 1, rotate: -20, duration: 0.3, ease: "power2.out" }
-        )
-        .to(badgeRef.current, { scale: 0.9, rotate: -8, duration: 0.1 })
-        .to(badgeRef.current, { scale: 1.1, rotate: -15, duration: 0.1 })
-        .to(badgeRef.current, { scale: 1, rotate: -12, duration: 0.2, ease: "elastic.out(1, 0.5)" })
-
-      // Add pulsing glow to badge
-      gsap.to(badgeRef.current, {
-        boxShadow: "0 0 30px rgba(239, 68, 68, 0.6), 0 0 60px rgba(239, 68, 68, 0.3)",
-        repeat: -1,
-        yoyo: true,
-        duration: 1.5,
-        ease: "sine.inOut",
-      })
-
-      // Speaker cards - staggered reveal with glitch effect
+      // Speaker cards - staggered fade in
       if (cardsRef.current) {
         const cards = cardsRef.current.children
-        
-        Array.from(cards).forEach((card, index) => {
-          const cardEl = card as HTMLElement
-          
-          // Initial reveal animation
-          gsap.fromTo(
-            cardEl,
-            { 
-              y: 60, 
-              opacity: 0, 
-              scale: 0.8,
-              filter: "blur(10px)",
-            },
-            {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              filter: "blur(0px)",
-              duration: 0.7,
-              delay: index * 0.15,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: cardsRef.current,
-                start: "top 85%",
-              },
-            }
-          )
-
-          // Continuous subtle glitch effect
-          const glitchCard = () => {
-            if (!cardEl.matches(":hover")) {
-              const randomX = (Math.random() - 0.5) * 4
-              const randomY = (Math.random() - 0.5) * 4
-              const randomSkew = (Math.random() - 0.5) * 2
-              
-              gsap.to(cardEl, {
-                x: randomX,
-                y: randomY,
-                skewX: randomSkew,
-                duration: 0.05,
-                onComplete: () => {
-                  gsap.to(cardEl, {
-                    x: 0,
-                    y: 0,
-                    skewX: 0,
-                    duration: 0.05,
-                  })
-                },
-              })
-            }
-          }
-
-          // Random glitch intervals
-          const startGlitch = () => {
-            const randomDelay = 2000 + Math.random() * 4000
-            setTimeout(() => {
-              glitchCard()
-              startGlitch()
-            }, randomDelay)
-          }
-          
-          startGlitch()
-        })
-      }
-
-      // Bottom text - typewriter effect
-      if (textRef.current) {
         gsap.fromTo(
-          textRef.current,
-          { opacity: 0, y: 20 },
+          cards,
+          { y: 40, opacity: 0, scale: 0.95 },
           {
-            opacity: 1,
             y: 0,
-            duration: 0.8,
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.1,
             ease: "power2.out",
             scrollTrigger: {
-              trigger: textRef.current,
-              start: "top 92%",
+              trigger: cardsRef.current,
+              start: "top 85%",
             },
           }
         )
       }
 
-      // Glitch text animation for "???" elements
-      glitchTextRefs.current.forEach((ref, index) => {
-        if (!ref) return
-        
-        const glitchText = () => {
-          const originalText = "???"
-          let iterations = 0
-          const maxIterations = 10
-          
-          const interval = setInterval(() => {
-            ref.textContent = originalText
-              .split("")
-              .map((_, i) => {
-                if (iterations > i * 3) return originalText[i]
-                return glitchChars[Math.floor(Math.random() * glitchChars.length)]
-              })
-              .join("")
-            
-            iterations++
-            if (iterations > maxIterations) {
-              clearInterval(interval)
-              ref.textContent = originalText
-            }
-          }, 50)
-        }
-
-        // Trigger glitch on scroll into view
-        ScrollTrigger.create({
-          trigger: ref,
-          start: "top 90%",
-          onEnter: () => {
-            setTimeout(() => glitchText(), index * 200)
+      // Bottom text fade in
+      gsap.fromTo(
+        textRef.current,
+        { y: 20, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: textRef.current,
+            start: "top 92%",
           },
-        })
-
-        // Also glitch on hover
-        ref.parentElement?.addEventListener("mouseenter", glitchText)
-      })
-
+        }
+      )
     }, sectionRef)
 
     return () => ctx.revert()
   }, [])
 
   return (
-    <section ref={sectionRef} id="speakers" className="py-16 md:py-24 px-4 relative overflow-hidden">
-      {/* Scanline overlay effect */}
-      <div 
-        className="absolute inset-0 pointer-events-none z-10 opacity-[0.03]"
-        style={{
-          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)",
-        }}
-      />
-      
-      {/* Glitch color channels - decorative */}
-      <div className="absolute top-1/4 -left-10 w-40 h-40 bg-red-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 -right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "0.5s" }} />
-
-      <div className="max-w-6xl mx-auto relative">
+    <section ref={sectionRef} id="speakers" className="py-16 md:py-20 px-4 relative overflow-hidden">
+      <div className="max-w-6xl mx-auto">
         {/* Heading */}
         <div ref={headingRef} className="text-center mb-12">
           <h2 className="font-(--font-display) text-4xl sm:text-5xl md:text-7xl font-black uppercase inline-block">
-            <span className="bg-orange-400 text-black px-3 md:px-4 py-2 border-[3px] border-black brutal-shadow -rotate-1 inline-block relative">
+            <span className="bg-orange-400 text-black px-3 md:px-4 py-2 border-[3px] border-black brutal-shadow -rotate-1 inline-block">
               The Lineup
-              {/* Glitch overlay */}
-              <span className="absolute inset-0 bg-orange-400 mix-blend-multiply opacity-0 hover:opacity-100 transition-opacity" 
-                    style={{ clipPath: "polygon(0 45%, 100% 45%, 100% 55%, 0 55%)" }} />
             </span>
           </h2>
         </div>
@@ -236,24 +111,12 @@ export function SpeakersSection() {
           ref={badgeRef}
           className="absolute top-24 md:top-32 right-4 md:right-20 z-20"
         >
-          <div className="bg-red-600 text-white border-4 border-red-800 px-4 md:px-6 py-2 md:py-3 brutal-shadow -rotate-12 relative overflow-hidden">
-            {/* Animated stripe */}
-            <div 
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.2) 10px, rgba(0,0,0,0.2) 20px)",
-                animation: "stripe-move 1s linear infinite",
-              }}
-            />
-            <div className="flex items-center gap-2 relative">
-              <Lock className="w-5 h-5 md:w-6 md:h-6 animate-pulse" />
-              <span className="font-(--font-display) text-lg md:text-2xl font-black uppercase tracking-wider">
-                Top Secret
-              </span>
+          <div className="bg-red-600 text-white border-4 border-red-800 px-4 md:px-6 py-2 md:py-3 brutal-shadow -rotate-12">
+            <div className="flex items-center gap-2">
+              <Lock className="w-5 h-5 md:w-6 md:h-6" />
+              <span className="font-(--font-display) text-lg md:text-2xl font-black uppercase">Top Secret</span>
             </div>
-            <span className="text-xs md:text-sm font-bold uppercase tracking-wider relative">
-              Classified • TBA
-            </span>
+            <span className="text-xs md:text-sm font-bold uppercase tracking-wider">TBA</span>
           </div>
         </div>
 
@@ -262,53 +125,21 @@ export function SpeakersSection() {
           {speakers.map((_, index) => (
             <div
               key={index}
-              className="speaker-card bg-white border-[3px] border-black p-3 brutal-shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#000] group relative overflow-hidden"
+              className="bg-white border-[3px] border-black p-3 brutal-shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#000]"
               style={{ 
                 transform: `rotate(${(index - 1.5) * 1.5}deg)`,
               }}
-              data-magnetic="0.1"
             >
-              {/* Hover glitch effect overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-fuchsia-500/0 to-yellow-500/0 group-hover:from-cyan-500/10 group-hover:via-fuchsia-500/10 group-hover:to-yellow-500/10 transition-all duration-300" />
-              
-              <div className="aspect-square bg-gradient-to-br from-black/5 to-black/10 border-2 border-black flex flex-col items-center justify-center mb-3 relative overflow-hidden">
-                {/* Animated scan line */}
-                <div 
-                  className="absolute w-full h-1 bg-white/20 top-0 left-0"
-                  style={{
-                    animation: "scan 2s ease-in-out infinite",
-                    animationDelay: `${index * 0.5}s`,
-                  }}
-                />
-                
-                {/* Mystery icon with glitch */}
-                <div className="relative">
-                  <HelpCircle className="w-12 h-12 md:w-16 lg:w-20 md:h-16 lg:h-20 text-black/30 mb-2 group-hover:text-violet-500/50 transition-colors" />
-                  <Eye className="absolute inset-0 w-12 h-12 md:w-16 lg:w-20 md:h-16 lg:h-20 text-transparent group-hover:text-black/10 transition-all duration-300 opacity-0 group-hover:opacity-100" />
-                </div>
-                
-                <span 
-                  ref={(el) => { glitchTextRefs.current[index] = el }}
-                  className="font-bold text-black/40 text-sm uppercase font-mono tracking-wider"
-                >
-                  ???
-                </span>
-                
-                {/* Corner decorations */}
-                <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-black/20" />
-                <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-black/20" />
-                <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-black/20" />
-                <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-black/20" />
+              <div className="aspect-square bg-gradient-to-br from-black/5 to-black/10 border-2 border-black flex flex-col items-center justify-center mb-3">
+                <HelpCircle className="w-12 h-12 md:w-16 lg:w-20 md:h-16 lg:h-20 text-black/30 mb-2" />
+                <span className="font-bold text-black/40 text-sm uppercase">???</span>
               </div>
 
-              <div className="text-center py-2 relative">
-                <p className="font-(--font-display) text-sm md:text-base font-black uppercase text-black/60 group-hover:text-black transition-colors">
+              <div className="text-center py-2">
+                <p className="font-(--font-display) text-sm md:text-base font-black uppercase text-black/60">
                   Speaker {index + 1}
                 </p>
-                <p className="text-xs md:text-sm font-bold uppercase text-violet-600 flex items-center justify-center gap-1">
-                  <span className="inline-block w-2 h-2 bg-violet-600 rounded-full animate-pulse" />
-                  Coming Soon
-                </p>
+                <p className="text-xs md:text-sm font-bold uppercase text-violet-600">Coming Soon</p>
               </div>
             </div>
           ))}
@@ -322,18 +153,6 @@ export function SpeakersSection() {
           🎤 Industry experts & community legends incoming... Stay tuned!
         </p>
       </div>
-
-      {/* Custom animations */}
-      <style jsx>{`
-        @keyframes scan {
-          0%, 100% { top: 0%; opacity: 0; }
-          50% { top: 100%; opacity: 0.5; }
-        }
-        @keyframes stripe-move {
-          0% { background-position: 0 0; }
-          100% { background-position: 28px 0; }
-        }
-      `}</style>
     </section>
   )
 }
