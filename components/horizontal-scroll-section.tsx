@@ -67,8 +67,10 @@ export function HorizontalScrollSection() {
   const mobileCardsRef = useRef<HTMLDivElement[]>([])
   const headingRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     const mm = gsap.matchMedia()
 
     mm.add({
@@ -236,6 +238,12 @@ export function HorizontalScrollSection() {
     return () => ctx.revert()
   }, [isMobile])
 
+  // Prevent hydration mismatch - always render desktop layout on server
+  // Client will switch to mobile layout after mount if needed
+  if (!mounted) {
+    return null
+  }
+
   // Mobile Layout - Vertical scrolling cards
   if (isMobile) {
     return (
@@ -357,9 +365,10 @@ export function HorizontalScrollSection() {
 
       {/* Main content */}
       <div className="relative min-h-screen flex items-center">
+
         {/* Section header - fixed on left */}
-        <div className="fixed left-8 top-1/2 -translate-y-1/2 z-20 hidden lg:block">
-          <div className="transform -rotate-90 origin-left whitespace-nowrap">
+        <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 hidden lg:block">
+          <div className="transform -rotate-90 origin-bottom-left whitespace-nowrap translate-y-1/2">
             <span className="font-(--font-display) text-6xl text-white/10 uppercase tracking-widest">
               Event Tracks
             </span>
