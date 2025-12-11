@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Users, Code, Calendar, Trophy, Coffee, GitBranch } from "lucide-react"
+import { getDeviceCapabilities } from "@/lib/mobile-optimization"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -61,9 +62,11 @@ export function StatsCounter() {
 
   useEffect(() => {
     if (!sectionRef.current) return
+    
+    const { isMobile, isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
 
     const ctx = gsap.context(() => {
-      // Heading animation with glitch effect
+      // Heading animation with glitch effect (skip glitch on mobile)
       const headingTl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -75,46 +78,46 @@ export function StatsCounter() {
         .fromTo(
           headingRef.current,
           {
-            y: 50,
+            y: isMobile ? 30 : 50,
             opacity: 0,
-            skewX: -10,
+            skewX: isLowEndDevice ? 0 : -10,
           },
           {
             y: 0,
             opacity: 1,
             skewX: 0,
-            duration: 0.8,
+            duration: isMobile ? 0.5 : 0.8,
             ease: "power3.out",
           }
         )
-        // Glitch effect
-        .to(headingRef.current, {
+      
+      // Glitch effect (skip on mobile/low-end)
+      if (!isMobile && !isLowEndDevice && !prefersReducedMotion) {
+        headingTl.to(headingRef.current, {
           x: 5,
           duration: 0.05,
           repeat: 3,
           yoyo: true,
         })
+      }
 
-      // Counter cards entrance with 3D effect
+      // Counter cards entrance with 3D effect (simplified on mobile)
       countersRef.current.forEach((counter, index) => {
         if (!counter) return
 
+        const fromState = isLowEndDevice || isMobile
+          ? { opacity: 0, y: 50, scale: 0.9 }
+          : { opacity: 0, y: 100, rotateX: 45, scale: 0.8 }
+        
+        const toState = isLowEndDevice || isMobile
+          ? { opacity: 1, y: 0, scale: 1, duration: 0.5, delay: index * 0.08, ease: "power2.out" }
+          : { opacity: 1, y: 0, rotateX: 0, scale: 1, duration: 0.8, delay: index * 0.1, ease: "back.out(1.4)" }
+
         gsap.fromTo(
           counter,
+          fromState,
           {
-            opacity: 0,
-            y: 100,
-            rotateX: 45,
-            scale: 0.8,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            rotateX: 0,
-            scale: 1,
-            duration: 0.8,
-            delay: index * 0.1,
-            ease: "back.out(1.4)",
+            ...toState,
             scrollTrigger: {
               trigger: counter,
               start: "top 90%",
@@ -187,8 +190,8 @@ export function StatsCounter() {
       <div className="max-w-6xl mx-auto relative">
         {/* Heading */}
         <div ref={headingRef} className="text-center mb-16">
-          <h2 className="font-(--font-display) text-4xl sm:text-5xl md:text-7xl font-black uppercase inline-block">
-            <span className="bg-gradient-to-r from-yellow-400 via-fuchsia-500 to-cyan-400 bg-clip-text text-transparent relative">
+          <h2 className="font-(--font-display) text-4xl sm:text-5xl md:text-7xl uppercase inline-block">
+            <span className="bg-linear-to-r from-yellow-400 via-fuchsia-500 to-cyan-400 bg-clip-text text-transparent relative">
               By The Numbers
               {/* Decorative underline */}
               <svg
@@ -224,7 +227,7 @@ export function StatsCounter() {
               }}
             >
               {/* Hover shine effect */}
-              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/30 to-transparent" />
 
               {/* Icon */}
               <div className="mb-4 inline-block p-2 bg-black/10 border-2 border-black/20">
@@ -232,7 +235,7 @@ export function StatsCounter() {
               </div>
 
               {/* Number */}
-              <div className="font-(--font-display) text-4xl md:text-5xl lg:text-6xl font-black text-black flex items-baseline gap-1">
+              <div className="font-(--font-display) text-4xl md:text-5xl lg:text-6xl text-black flex items-baseline gap-1">
                 <span
                   ref={(el) => {
                     if (el) numberRefs.current[index] = el

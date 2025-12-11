@@ -60,6 +60,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 ## Credits
 
 Built by GDG DAU Team
+-Aditya Vaish & Neel Khatri
 
 ## License
 

@@ -4,6 +4,7 @@ import { Archivo_Black, Space_Grotesk } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { CustomCursor } from "@/components/custom-cursor"
 import { ScrollProgress } from "@/components/scroll-progress"
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
 const archivoBlack = Archivo_Black({
@@ -29,10 +30,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${archivoBlack.variable} ${spaceGrotesk.variable} font-sans antialiased cursor-none lg:cursor-none`}>
+      <body className={`${archivoBlack.variable} ${spaceGrotesk.variable} font-sans antialiased cursor-auto lg:cursor-none`}>
         <CustomCursor />
         <ScrollProgress />
         {children}
+        <Toaster />
         <Analytics />
       </body>
     </html>

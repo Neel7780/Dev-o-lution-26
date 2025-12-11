@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Brain, Link, Cloud, Smartphone, Database, Shield } from "lucide-react"
+import { getDeviceCapabilities } from "@/lib/mobile-optimization"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -68,6 +69,7 @@ export function TracksSection() {
     if (!sectionRef.current || !cardsRef.current) return
 
     const isMobile = window.innerWidth < 768
+    const { isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
 
     const ctx = gsap.context(() => {
       // Heading animation with character split effect
@@ -219,7 +221,7 @@ export function TracksSection() {
     <section ref={sectionRef} id="tracks" className="py-16 md:py-24 px-4 overflow-hidden" style={{ perspective: "1200px" }}>
       <div ref={containerRef} className="max-w-6xl mx-auto">
         <div ref={headingRef} className="text-center mb-12 md:mb-16" style={{ transformStyle: "preserve-3d" }}>
-          <h2 className="font-[var(--font-display)] text-4xl sm:text-5xl md:text-7xl uppercase inline-block">
+          <h2 className="font-(--font-display) text-4xl sm:text-5xl md:text-7xl uppercase inline-block">
             <span className="bg-fuchsia-500 text-white px-3 md:px-4 py-2 border-[3px] border-black brutal-shadow -rotate-1 inline-block">
               Event Tracks
             </span>
@@ -272,7 +274,7 @@ export function TracksSection() {
                 <div className="track-icon inline-block p-3 bg-white/20 border-2 border-black/20 mb-4 transition-transform duration-300">
                   <track.icon className="w-10 h-10 md:w-12 md:h-12" strokeWidth={2.5} />
                 </div>
-                <h3 className="font-[var(--font-display)] text-xl md:text-2xl font-black uppercase mb-3">
+                <h3 className="font-(--font-display) text-xl md:text-2xl uppercase mb-3">
                   {track.title}
                 </h3>
                 <p className="font-medium opacity-80 text-sm md:text-base leading-relaxed">
@@ -280,7 +282,7 @@ export function TracksSection() {
                 </p>
                 
                 {/* Arrow indicator */}
-                <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
+                <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transform -translate-x-2.5 group-hover:translate-x-0 transition-all duration-300">
                   <span className="text-sm font-bold uppercase">Explore</span>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />

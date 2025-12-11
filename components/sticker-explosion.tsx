@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { getDeviceCapabilities, shouldDisableAnimation } from "@/lib/mobile-optimization"
 import { 
   Sparkles, Zap, Star, Heart, Flame, Music, 
   Rocket, Coffee, Code, Gamepad2, Pizza, PartyPopper 
@@ -33,6 +34,12 @@ interface StickerExplosionProps {
 export function StickerExplosion({ children, className = "" }: StickerExplosionProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const stickersRef = useRef<HTMLDivElement[]>([])
+  const { isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
+  
+  // Disable on low-end devices or reduced motion
+  if (isLowEndDevice || prefersReducedMotion || shouldDisableAnimation('complex')) {
+    return <div className={className}>{children}</div>
+  }
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -114,19 +121,20 @@ export function StickerExplosion({ children, className = "" }: StickerExplosionP
   )
 }
 
-// Confetti burst component
 export function ConfettiBurst({ trigger }: { trigger?: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const confettiRef = useRef<HTMLDivElement[]>([])
+  const tweensRef = useRef<gsap.core.Tween[]>([])
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
 
     const colors = ["#facc15", "#22d3ee", "#d946ef", "#a3e635", "#fb923c", "#8b5cf6"]
-    const confettiCount = 50
+    const confettiCount = 30 // Reduced from 50 for performance
 
     const ctx = gsap.context(() => {
-      ScrollTrigger.create({
+      scrollTriggerRef.current = ScrollTrigger.create({
         trigger: trigger || containerRef.current,
         start: "top 80%",
         onEnter: () => {
@@ -137,37 +145,68 @@ export function ConfettiBurst({ trigger }: { trigger?: string }) {
             confetti.style.background = colors[Math.floor(Math.random() * colors.length)]
             confetti.style.left = "50%"
             confetti.style.top = "50%"
+            confetti.style.willChange = "transform"
             containerRef.current?.appendChild(confetti)
+            confettiRef.current.push(confetti)
 
             const angle = Math.random() * Math.PI * 2
             const velocity = 100 + Math.random() * 200
             const targetX = Math.cos(angle) * velocity
             const targetY = Math.sin(angle) * velocity - 100
 
-            gsap.fromTo(
+            const tween = gsap.fromTo(
               confetti,
               {
                 x: 0,
                 y: 0,
-                rotation: 0,
+                opacity: 1,
                 scale: 1,
+                rotation: 0,
               },
               {
                 x: targetX,
                 y: targetY + 300, // Gravity
                 rotation: Math.random() * 720 - 360,
                 scale: 0,
+                opacity: 0,
                 duration: 1.5 + Math.random(),
                 ease: "power2.out",
-                onComplete: () => confetti.remove(),
+                onComplete: () => {
+                  confetti.remove()
+                  // Remove from array to free memory
+                  const idx = confettiRef.current.indexOf(confetti)
+                  if (idx > -1) {
+                    confettiRef.current.splice(idx, 1)
+                  }
+                },
               }
             )
+            tweensRef.current.push(tween)
           }
         },
+        once: true, // Only trigger once
       })
     }, containerRef)
 
-    return () => ctx.revert()
+    return () => {
+      ctx.revert()
+      // Clean up tweens
+      tweensRef.current.forEach(tween => tween.kill())
+      tweensRef.current = []
+      
+      // Clean up confetti elements
+      confettiRef.current.forEach(el => {
+        try {
+          el.remove()
+        } catch (e) {
+          // Already removed
+        }
+      })
+      confettiRef.current = []
+      
+      scrollTriggerRef.current?.kill()
+      scrollTriggerRef.current = null
+    }
   }, [trigger])
 
   return <div ref={containerRef} className="absolute inset-0 pointer-events-none overflow-visible" />
@@ -264,8 +303,11 @@ export function ParallaxCard({ children, className = "", speed = 0.5 }: Parallax
 
       // 3D tilt on hover (desktop only)
       if (typeof window !== "undefined" && window.innerWidth >= 768) {
+        const card = cardRef.current
+        if (!card) return
+
         const handleMouseMove = (e: MouseEvent) => {
-          const rect = cardRef.current!.getBoundingClientRect()
+          const rect = card.getBoundingClientRect()
           const x = e.clientX - rect.left
           const y = e.clientY - rect.top
           const centerX = rect.width / 2
@@ -274,7 +316,7 @@ export function ParallaxCard({ children, className = "", speed = 0.5 }: Parallax
           const rotateX = (y - centerY) / 20
           const rotateY = (centerX - x) / 20
 
-          gsap.to(cardRef.current, {
+          gsap.to(card, {
             rotateX: -rotateX,
             rotateY: rotateY,
             duration: 0.5,
@@ -283,7 +325,7 @@ export function ParallaxCard({ children, className = "", speed = 0.5 }: Parallax
         }
 
         const handleMouseLeave = () => {
-          gsap.to(cardRef.current, {
+          gsap.to(card, {
             rotateX: 0,
             rotateY: 0,
             duration: 0.5,
@@ -291,12 +333,12 @@ export function ParallaxCard({ children, className = "", speed = 0.5 }: Parallax
           })
         }
 
-        cardRef.current.addEventListener("mousemove", handleMouseMove)
-        cardRef.current.addEventListener("mouseleave", handleMouseLeave)
+        card.addEventListener("mousemove", handleMouseMove)
+        card.addEventListener("mouseleave", handleMouseLeave)
 
         return () => {
-          cardRef.current?.removeEventListener("mousemove", handleMouseMove)
-          cardRef.current?.removeEventListener("mouseleave", handleMouseLeave)
+          card.removeEventListener("mousemove", handleMouseMove)
+          card.removeEventListener("mouseleave", handleMouseLeave)
         }
       }
     }, cardRef)

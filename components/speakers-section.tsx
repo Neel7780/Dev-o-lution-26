@@ -24,21 +24,22 @@ export function SpeakersSection() {
     if (!sectionRef.current) return
 
     const isMobile = window.innerWidth < 768
+    const timeoutIds: ReturnType<typeof setTimeout>[] = []
 
     const ctx = gsap.context(() => {
       // Heading animation - dramatic reveal with clip path
       gsap.fromTo(
         headingRef.current,
-        { 
-          y: 50, 
+        {
+          y: 50,
           opacity: 0,
-          clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)",
+          clipPath: isMobile ? "none" : "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)",
         },
         {
           y: 0,
           opacity: 1,
-          clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0 100%)",
-          duration: 1,
+          clipPath: isMobile ? "none" : "polygon(0 0%, 100% 0%, 100% 100%, 0 100%)",
+          duration: isMobile ? 0.6 : 1,
           ease: "power3.out",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -47,7 +48,7 @@ export function SpeakersSection() {
         }
       )
 
-      // Top secret badge - glitchy entrance
+      // Top secret badge - glitchy entrance (simplified on mobile)
       const badgeTl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -55,48 +56,59 @@ export function SpeakersSection() {
         },
       })
 
-      badgeTl
-        .fromTo(
+      if (isMobile) {
+        // Simple entrance on mobile
+        badgeTl.fromTo(
           badgeRef.current,
-          { scale: 0, opacity: 0, rotate: 180 },
-          { scale: 1.2, opacity: 1, rotate: -20, duration: 0.3, ease: "power2.out" }
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, rotate: -12, duration: 0.5, ease: "back.out(1.7)" }
         )
-        .to(badgeRef.current, { scale: 0.9, rotate: -8, duration: 0.1 })
-        .to(badgeRef.current, { scale: 1.1, rotate: -15, duration: 0.1 })
-        .to(badgeRef.current, { scale: 1, rotate: -12, duration: 0.2, ease: "elastic.out(1, 0.5)" })
+      } else {
+        badgeTl
+          .fromTo(
+            badgeRef.current,
+            { scale: 0, opacity: 0, rotate: 180 },
+            { scale: 1.2, opacity: 1, rotate: -20, duration: 0.3, ease: "power2.out" }
+          )
+          .to(badgeRef.current, { scale: 0.9, rotate: -8, duration: 0.1 })
+          .to(badgeRef.current, { scale: 1.1, rotate: -15, duration: 0.1 })
+          .to(badgeRef.current, { scale: 1, rotate: -12, duration: 0.2, ease: "elastic.out(1, 0.5)" })
+      }
 
-      // Add pulsing glow to badge
-      gsap.to(badgeRef.current, {
-        boxShadow: "0 0 30px rgba(239, 68, 68, 0.6), 0 0 60px rgba(239, 68, 68, 0.3)",
-        repeat: -1,
-        yoyo: true,
-        duration: 1.5,
-        ease: "sine.inOut",
-      })
+      // Add pulsing glow to badge (skip on mobile)
+      if (!isMobile) {
+        gsap.to(badgeRef.current, {
+          boxShadow: "0 0 30px rgba(239, 68, 68, 0.6), 0 0 60px rgba(239, 68, 68, 0.3)",
+          repeat: -1,
+          yoyo: true,
+          duration: 1.5,
+          ease: "sine.inOut",
+        })
+      }
 
-      // Speaker cards - staggered reveal with glitch effect
+      // Speaker cards - staggered reveal (no glitch on mobile)
       if (cardsRef.current) {
         const cards = cardsRef.current.children
-        
+
         Array.from(cards).forEach((card, index) => {
           const cardEl = card as HTMLElement
-          
+
           // Initial reveal animation
           gsap.fromTo(
             cardEl,
-            { 
-              y: 60, 
-              opacity: 0, 
-              scale: 0.8,
-              filter: "blur(10px)",
+            {
+              y: 60,
+              opacity: 0,
+              scale: 0.9,
+              filter: isMobile ? "none" : "blur(10px)",
             },
             {
               y: 0,
               opacity: 1,
               scale: 1,
               filter: "blur(0px)",
-              duration: 0.7,
-              delay: index * 0.15,
+              duration: 0.6,
+              delay: index * 0.1,
               ease: "power3.out",
               scrollTrigger: {
                 trigger: cardsRef.current,
@@ -105,40 +117,43 @@ export function SpeakersSection() {
             }
           )
 
-          // Continuous subtle glitch effect
-          const glitchCard = () => {
-            if (!cardEl.matches(":hover")) {
-              const randomX = (Math.random() - 0.5) * 4
-              const randomY = (Math.random() - 0.5) * 4
-              const randomSkew = (Math.random() - 0.5) * 2
-              
-              gsap.to(cardEl, {
-                x: randomX,
-                y: randomY,
-                skewX: randomSkew,
-                duration: 0.05,
-                onComplete: () => {
-                  gsap.to(cardEl, {
-                    x: 0,
-                    y: 0,
-                    skewX: 0,
-                    duration: 0.05,
-                  })
-                },
-              })
-            }
-          }
+          // Continuous subtle glitch effect - DESKTOP ONLY to avoid memory leak
+          if (!isMobile) {
+            const glitchCard = () => {
+              if (!cardEl.matches(":hover")) {
+                const randomX = (Math.random() - 0.5) * 4
+                const randomY = (Math.random() - 0.5) * 4
+                const randomSkew = (Math.random() - 0.5) * 2
 
-          // Random glitch intervals
-          const startGlitch = () => {
-            const randomDelay = 2000 + Math.random() * 4000
-            setTimeout(() => {
-              glitchCard()
-              startGlitch()
-            }, randomDelay)
+                gsap.to(cardEl, {
+                  x: randomX,
+                  y: randomY,
+                  skewX: randomSkew,
+                  duration: 0.05,
+                  onComplete: () => {
+                    gsap.to(cardEl, {
+                      x: 0,
+                      y: 0,
+                      skewX: 0,
+                      duration: 0.05,
+                    })
+                  },
+                })
+              }
+            }
+
+            // Random glitch intervals - store IDs for cleanup
+            const startGlitch = () => {
+              const randomDelay = 2000 + Math.random() * 4000
+              const timeoutId = setTimeout(() => {
+                glitchCard()
+                startGlitch()
+              }, randomDelay)
+              timeoutIds.push(timeoutId)
+            }
+
+            startGlitch()
           }
-          
-          startGlitch()
         })
       }
 
@@ -160,60 +175,67 @@ export function SpeakersSection() {
         )
       }
 
-      // Glitch text animation for "???" elements
-      glitchTextRefs.current.forEach((ref, index) => {
-        if (!ref) return
-        
-        const glitchText = () => {
-          const originalText = "???"
-          let iterations = 0
-          const maxIterations = 10
-          
-          const interval = setInterval(() => {
-            ref.textContent = originalText
-              .split("")
-              .map((_, i) => {
-                if (iterations > i * 3) return originalText[i]
-                return glitchChars[Math.floor(Math.random() * glitchChars.length)]
-              })
-              .join("")
-            
-            iterations++
-            if (iterations > maxIterations) {
-              clearInterval(interval)
+      // Glitch text animation for "???" elements - DESKTOP ONLY
+      if (!isMobile) {
+        glitchTextRefs.current.forEach((ref, index) => {
+          if (!ref) return
+
+          const glitchText = () => {
+            const originalText = "???"
+            let iterations = 0
+            const maxIterations = 10
+
+            const interval = setInterval(() => {
               ref.textContent = originalText
-            }
-          }, 50)
-        }
+                .split("")
+                .map((_, i) => {
+                  if (iterations > i * 3) return originalText[i]
+                  return glitchChars[Math.floor(Math.random() * glitchChars.length)]
+                })
+                .join("")
 
-        // Trigger glitch on scroll into view
-        ScrollTrigger.create({
-          trigger: ref,
-          start: "top 90%",
-          onEnter: () => {
-            setTimeout(() => glitchText(), index * 200)
-          },
+              iterations++
+              if (iterations > maxIterations) {
+                clearInterval(interval)
+                ref.textContent = originalText
+              }
+            }, 50)
+          }
+
+          // Trigger glitch on scroll into view
+          ScrollTrigger.create({
+            trigger: ref,
+            start: "top 90%",
+            onEnter: () => {
+              const timeoutId = setTimeout(() => glitchText(), index * 200)
+              timeoutIds.push(timeoutId)
+            },
+          })
+
+          // Also glitch on hover
+          ref.parentElement?.addEventListener("mouseenter", glitchText)
         })
-
-        // Also glitch on hover
-        ref.parentElement?.addEventListener("mouseenter", glitchText)
-      })
+      }
 
     }, sectionRef)
 
-    return () => ctx.revert()
+    return () => {
+      ctx.revert()
+      // Clear all timeouts to prevent memory leaks
+      timeoutIds.forEach(id => clearTimeout(id))
+    }
   }, [])
 
   return (
     <section ref={sectionRef} id="speakers" className="py-16 md:py-24 px-4 relative overflow-hidden">
       {/* Scanline overlay effect */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none z-10 opacity-[0.03]"
         style={{
           backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)",
         }}
       />
-      
+
       {/* Glitch color channels - decorative */}
       <div className="absolute top-1/4 -left-10 w-40 h-40 bg-red-500/10 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-1/4 -right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "0.5s" }} />
@@ -225,8 +247,8 @@ export function SpeakersSection() {
             <span className="bg-orange-400 text-black px-3 md:px-4 py-2 border-[3px] border-black brutal-shadow -rotate-1 inline-block relative">
               The Lineup
               {/* Glitch overlay */}
-              <span className="absolute inset-0 bg-orange-400 mix-blend-multiply opacity-0 hover:opacity-100 transition-opacity" 
-                    style={{ clipPath: "polygon(0 45%, 100% 45%, 100% 55%, 0 55%)" }} />
+              <span className="absolute inset-0 bg-orange-400 mix-blend-multiply opacity-0 hover:opacity-100 transition-opacity"
+                style={{ clipPath: "polygon(0 45%, 100% 45%, 100% 55%, 0 55%)" }} />
             </span>
           </h2>
         </div>
@@ -238,7 +260,7 @@ export function SpeakersSection() {
         >
           <div className="bg-red-600 text-white border-4 border-red-800 px-4 md:px-6 py-2 md:py-3 brutal-shadow -rotate-12 relative overflow-hidden">
             {/* Animated stripe */}
-            <div 
+            <div
               className="absolute inset-0 opacity-20"
               style={{
                 backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.2) 10px, rgba(0,0,0,0.2) 20px)",
@@ -263,37 +285,37 @@ export function SpeakersSection() {
             <div
               key={index}
               className="speaker-card bg-white border-[3px] border-black p-3 brutal-shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#000] group relative overflow-hidden"
-              style={{ 
+              style={{
                 transform: `rotate(${(index - 1.5) * 1.5}deg)`,
               }}
               data-magnetic="0.1"
             >
               {/* Hover glitch effect overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-fuchsia-500/0 to-yellow-500/0 group-hover:from-cyan-500/10 group-hover:via-fuchsia-500/10 group-hover:to-yellow-500/10 transition-all duration-300" />
-              
+
               <div className="aspect-square bg-gradient-to-br from-black/5 to-black/10 border-2 border-black flex flex-col items-center justify-center mb-3 relative overflow-hidden">
                 {/* Animated scan line */}
-                <div 
+                <div
                   className="absolute w-full h-1 bg-white/20 top-0 left-0"
                   style={{
                     animation: "scan 2s ease-in-out infinite",
                     animationDelay: `${index * 0.5}s`,
                   }}
                 />
-                
+
                 {/* Mystery icon with glitch */}
                 <div className="relative">
                   <HelpCircle className="w-12 h-12 md:w-16 lg:w-20 md:h-16 lg:h-20 text-black/30 mb-2 group-hover:text-violet-500/50 transition-colors" />
                   <Eye className="absolute inset-0 w-12 h-12 md:w-16 lg:w-20 md:h-16 lg:h-20 text-transparent group-hover:text-black/10 transition-all duration-300 opacity-0 group-hover:opacity-100" />
                 </div>
-                
-                <span 
+
+                <span
                   ref={(el) => { glitchTextRefs.current[index] = el }}
                   className="font-bold text-black/40 text-sm uppercase font-mono tracking-wider"
                 >
                   ???
                 </span>
-                
+
                 {/* Corner decorations */}
                 <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-black/20" />
                 <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-black/20" />

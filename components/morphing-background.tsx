@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useMemo } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { getDeviceCapabilities, shouldDisableAnimation } from "@/lib/mobile-optimization"
 
 gsap.registerPlugin(ScrollTrigger)
 
-// SVG blob paths for morphing
+// SVG blob paths for morphing (memoized)
 const blobPaths = [
   "M45.3,-58.9C57.9,-47.7,67.2,-32.6,70.9,-15.9C74.6,0.8,72.7,19.1,64.3,33.5C55.9,47.9,41.1,58.4,24.5,65.2C7.9,72,-10.6,75.1,-27.8,70.5C-45,65.9,-60.9,53.6,-70.4,37.3C-79.9,21,-83,-0.4,-78.1,-19.4C-73.2,-38.4,-60.4,-55,-44.6,-65.5C-28.8,-76,-14.4,-80.4,1.3,-82C17,-83.6,32.7,-70.1,45.3,-58.9Z",
   "M43.2,-54.8C55.7,-44.3,65.2,-30.4,69.1,-14.7C73,1,71.4,18.5,63.8,32.7C56.2,46.9,42.7,57.8,27.4,64.1C12.1,70.4,-5,72.1,-21.4,68.4C-37.8,64.7,-53.5,55.6,-63.1,42.1C-72.7,28.6,-76.2,10.7,-73.1,-5.8C-70,-22.3,-60.3,-37.4,-47.3,-47.9C-34.3,-58.4,-17.2,-64.3,-0.4,-63.8C16.4,-63.3,30.7,-65.3,43.2,-54.8Z",
@@ -18,12 +19,19 @@ export function MorphingBackground() {
   const path1Ref = useRef<SVGPathElement>(null)
   const path2Ref = useRef<SVGPathElement>(null)
   const path3Ref = useRef<SVGPathElement>(null)
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
+  const tweensRef = useRef<gsap.core.Tween[]>([])
 
   useEffect(() => {
+    const { isMobile, isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
+    
+    // Disable morphing on low-end devices or reduced motion
+    if (isLowEndDevice || prefersReducedMotion) return
+    
     const ctx = gsap.context(() => {
-      // Morphing animation for each blob
+      // Morphing animation for each blob - optimized
       const morphBlob = (pathRef: React.RefObject<SVGPathElement | null>, index: number) => {
-        if (!pathRef.current) return
+        if (!pathRef.current || !pathRef.current.parentElement) return
 
         const paths = [...blobPaths]
         // Rotate the paths array based on index for variety
@@ -31,47 +39,59 @@ export function MorphingBackground() {
           paths.push(paths.shift()!)
         }
 
-        gsap.to(pathRef.current, {
+        // Cache tweens for cleanup
+        const tween1 = gsap.to(pathRef.current, {
           attr: { d: paths[1] },
-          duration: 4,
+          duration: isMobile ? 6 : 4, // Slower on mobile
           ease: "sine.inOut",
           repeat: -1,
           yoyo: true,
-          repeatDelay: 0.5,
+          repeatDelay: isMobile ? 1 : 0.5,
         })
 
-        // Add rotation
-        gsap.to(pathRef.current.parentElement, {
+        // Add rotation - separate animation (disable on mobile)
+        const tween2 = isMobile ? null : gsap.to(pathRef.current.parentElement, {
           rotation: 360,
           duration: 40 + index * 10,
           ease: "none",
           repeat: -1,
         })
 
-        // Subtle scale pulsing
-        gsap.to(pathRef.current, {
-          scale: 1.1,
-          duration: 3 + index,
+        // Subtle scale pulsing (disable on mobile)
+        const tween3 = isMobile ? null : gsap.to(pathRef.current, {
+          scale: 1.05, // Less scale on mobile
+          duration: 4 + index,
           ease: "sine.inOut",
           repeat: -1,
           yoyo: true,
         })
+
+        tweensRef.current.push(tween1)
+        if (tween2) tweensRef.current.push(tween2)
+        if (tween3) tweensRef.current.push(tween3)
       }
 
       morphBlob(path1Ref, 0)
       morphBlob(path2Ref, 1)
       morphBlob(path3Ref, 2)
 
-      // Scroll-linked color shift
-      ScrollTrigger.create({
+      // Scroll-linked color shift - single trigger (throttled on mobile)
+      let lastColorUpdate = 0
+      const colorThrottle = isMobile ? 200 : 0
+      
+      scrollTriggerRef.current = ScrollTrigger.create({
         trigger: document.body,
         start: "top top",
         end: "bottom bottom",
         onUpdate: (self) => {
+          const now = Date.now()
+          if (now - lastColorUpdate < colorThrottle) return
+          lastColorUpdate = now
           const hue1 = gsap.utils.interpolate([48, 280, 180, 48], self.progress)
           const hue2 = gsap.utils.interpolate([180, 48, 280, 180], self.progress)
           const hue3 = gsap.utils.interpolate([280, 180, 48, 280], self.progress)
 
+          // Use native DOM updates instead of GSAP for color
           if (path1Ref.current) {
             path1Ref.current.style.fill = `hsla(${hue1}, 80%, 60%, 0.15)`
           }
@@ -85,7 +105,13 @@ export function MorphingBackground() {
       })
     })
 
-    return () => ctx.revert()
+    return () => {
+      ctx.revert()
+      tweensRef.current.forEach(tween => tween.kill())
+      tweensRef.current = []
+      scrollTriggerRef.current?.kill()
+      scrollTriggerRef.current = null
+    }
   }, [])
 
   return (
@@ -94,13 +120,14 @@ export function MorphingBackground() {
       <svg
         className="absolute -top-1/4 -left-1/4 w-[800px] h-[800px] opacity-60"
         viewBox="-100 -100 200 200"
+        style={{ willChange: "transform" }}
       >
         <g style={{ transformOrigin: "center" }}>
           <path
             ref={path1Ref}
             d={blobPaths[0]}
             fill="rgba(250, 204, 21, 0.15)"
-            style={{ filter: "blur(40px)" }}
+            style={{ filter: "blur(40px)", willChange: "d, fill" }}
           />
         </g>
       </svg>
@@ -109,13 +136,14 @@ export function MorphingBackground() {
       <svg
         className="absolute -bottom-1/4 -right-1/4 w-[700px] h-[700px] opacity-50"
         viewBox="-100 -100 200 200"
+        style={{ willChange: "transform" }}
       >
         <g style={{ transformOrigin: "center" }}>
           <path
             ref={path2Ref}
             d={blobPaths[1]}
             fill="rgba(34, 211, 238, 0.1)"
-            style={{ filter: "blur(50px)" }}
+            style={{ filter: "blur(50px)", willChange: "d, fill" }}
           />
         </g>
       </svg>
@@ -124,13 +152,14 @@ export function MorphingBackground() {
       <svg
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-40"
         viewBox="-100 -100 200 200"
+        style={{ willChange: "transform" }}
       >
         <g style={{ transformOrigin: "center" }}>
           <path
             ref={path3Ref}
             d={blobPaths[2]}
             fill="rgba(168, 85, 247, 0.08)"
-            style={{ filter: "blur(60px)" }}
+            style={{ filter: "blur(60px)", willChange: "d, fill" }}
           />
         </g>
       </svg>
@@ -138,12 +167,19 @@ export function MorphingBackground() {
   )
 }
 
-// Floating particles component
+// Floating particles component - optimized
 export function FloatingParticles() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const tweensRef = useRef<gsap.core.Tween[]>([])
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
+    
+    const { isMobile, isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
+    
+    // Disable on reduced motion
+    if (prefersReducedMotion) return
 
     const particles = containerRef.current.querySelectorAll(".particle")
     
@@ -155,12 +191,15 @@ export function FloatingParticles() {
           y: Math.random() * window.innerHeight,
         })
 
-        // Floating animation
-        gsap.to(particle, {
-          y: `-=${100 + Math.random() * 200}`,
-          x: `+=${(Math.random() - 0.5) * 100}`,
+        // Floating animation - cache tweens (simplified on mobile)
+        const duration = isMobile ? 8 + Math.random() * 4 : 5 + Math.random() * 5
+        const distance = isMobile ? 50 + Math.random() * 100 : 100 + Math.random() * 200
+        
+        const tween1 = gsap.to(particle, {
+          y: `-=${distance}`,
+          x: `+=${(Math.random() - 0.5) * (isMobile ? 50 : 100)}`,
           opacity: 0,
-          duration: 5 + Math.random() * 5,
+          duration,
           repeat: -1,
           delay: index * 0.5,
           ease: "none",
@@ -174,41 +213,60 @@ export function FloatingParticles() {
         })
 
         // Subtle rotation
-        gsap.to(particle, {
+        const tween2 = gsap.to(particle, {
           rotation: 360,
           duration: 10 + Math.random() * 10,
           repeat: -1,
           ease: "none",
         })
+
+        tweensRef.current.push(tween1, tween2)
       })
 
-      // Scroll-linked movement
-      ScrollTrigger.create({
+      // Scroll-linked movement - use throttling
+      let lastUpdate = 0
+      scrollTriggerRef.current = ScrollTrigger.create({
         trigger: document.body,
         start: "top top",
         end: "bottom bottom",
         onUpdate: (self) => {
+          const now = Date.now()
+          if (now - lastUpdate < 50) return // Throttle to 20fps for particles
+          lastUpdate = now
+
           const velocity = self.getVelocity() / 1000
           particles.forEach((particle) => {
             gsap.to(particle, {
               y: `-=${velocity * 2}`,
               duration: 0.5,
               ease: "power2.out",
+              overwrite: false,
             })
           })
         },
       })
     }, containerRef)
 
-    return () => ctx.revert()
+    return () => {
+      ctx.revert()
+      tweensRef.current.forEach(tween => tween.kill())
+      tweensRef.current = []
+      scrollTriggerRef.current?.kill()
+      scrollTriggerRef.current = null
+    }
   }, [])
 
+  const { isMobile, isLowEndDevice } = getDeviceCapabilities()
+  
+  // Reduce particles based on device
+  const particleCount = isLowEndDevice ? 5 : isMobile ? 8 : 15
+  
   return (
     <div
       ref={containerRef}
       className="fixed inset-0 -z-5 pointer-events-none overflow-hidden"
     >
-      {[...Array(20)].map((_, i) => (
+      {[...Array(particleCount)].map((_, i) => (
         <div
           key={i}
           className="particle absolute w-1 h-1 rounded-full"
@@ -220,6 +278,7 @@ export function FloatingParticles() {
               "rgba(236, 72, 153, 0.6)",
             ][i % 4],
             boxShadow: `0 0 ${4 + i % 3 * 2}px currentColor`,
+            willChange: "transform, opacity",
           }}
         />
       ))}
@@ -227,9 +286,11 @@ export function FloatingParticles() {
   )
 }
 
-// Gradient mesh background
+// Gradient mesh background - optimized
 export function GradientMesh() {
   const meshRef = useRef<HTMLDivElement>(null)
+  const tweensRef = useRef<gsap.core.Tween[]>([])
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
 
   useEffect(() => {
     if (!meshRef.current) return
@@ -238,32 +299,39 @@ export function GradientMesh() {
       const gradients = meshRef.current!.querySelectorAll(".gradient-orb")
 
       gradients.forEach((gradient, index) => {
-        // Floating motion
-        gsap.to(gradient, {
-          x: `random(-100, 100)`,
-          y: `random(-100, 100)`,
-          duration: `random(10, 20)`,
+        // Floating motion - optimized
+        const tween1 = gsap.to(gradient, {
+          x: () => Math.random() * 100 - 50, // Smaller movement
+          y: () => Math.random() * 100 - 50,
+          duration: 15 + index * 2,
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
         })
 
-        // Scale pulsing
-        gsap.to(gradient, {
-          scale: `random(0.8, 1.2)`,
-          duration: `random(5, 10)`,
+        // Scale pulsing - reduced
+        const tween2 = gsap.to(gradient, {
+          scale: 0.9 + Math.random() * 0.2,
+          duration: 8 + index,
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
         })
+
+        tweensRef.current.push(tween1, tween2)
       })
 
-      // Color shift on scroll
-      ScrollTrigger.create({
+      // Color shift on scroll - throttled
+      let lastColorUpdate = 0
+      scrollTriggerRef.current = ScrollTrigger.create({
         trigger: document.body,
         start: "top top",
         end: "bottom bottom",
         onUpdate: (self) => {
+          const now = Date.now()
+          if (now - lastColorUpdate < 100) return // Throttle
+          lastColorUpdate = now
+
           const progress = self.progress
           const hueShift = progress * 60
 
@@ -275,7 +343,13 @@ export function GradientMesh() {
       })
     }, meshRef)
 
-    return () => ctx.revert()
+    return () => {
+      ctx.revert()
+      tweensRef.current.forEach(tween => tween.kill())
+      tweensRef.current = []
+      scrollTriggerRef.current?.kill()
+      scrollTriggerRef.current = null
+    }
   }, [])
 
   return (
@@ -285,19 +359,31 @@ export function GradientMesh() {
     >
       <div
         className="gradient-orb absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(250, 204, 21, 0.3) 0%, transparent 70%)" }}
+        style={{
+          background: "radial-gradient(circle, rgba(250, 204, 21, 0.3) 0%, transparent 70%)",
+          willChange: "transform",
+        }}
       />
       <div
         className="gradient-orb absolute top-3/4 right-1/4 w-80 h-80 rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%)" }}
+        style={{
+          background: "radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%)",
+          willChange: "transform",
+        }}
       />
       <div
         className="gradient-orb absolute top-1/2 left-1/2 w-72 h-72 rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%)" }}
+        style={{
+          background: "radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%)",
+          willChange: "transform",
+        }}
       />
       <div
         className="gradient-orb absolute bottom-1/4 left-1/3 w-64 h-64 rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%)" }}
+        style={{
+          background: "radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%)",
+          willChange: "transform",
+        }}
       />
     </div>
   )

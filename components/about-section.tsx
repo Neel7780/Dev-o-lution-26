@@ -17,14 +17,16 @@ export function AboutSection() {
   const tagsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const isMobile = window.innerWidth < 768
+
     const ctx = gsap.context(() => {
-      // Card entrance with 3D perspective
+      // Card entrance with 3D perspective (simplified on mobile)
       gsap.fromTo(
         cardRef.current,
         {
           opacity: 0,
-          y: 100,
-          rotateX: 10,
+          y: isMobile ? 50 : 100,
+          rotateX: isMobile ? 0 : 10,
           scale: 0.95,
         },
         {
@@ -32,7 +34,7 @@ export function AboutSection() {
           y: 0,
           rotateX: 0,
           scale: 1,
-          duration: 1,
+          duration: isMobile ? 0.6 : 1,
           ease: "power3.out",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -42,24 +44,41 @@ export function AboutSection() {
         }
       )
 
-      // Heading reveal with clip-path wipe
-      gsap.fromTo(
-        headingRef.current,
-        {
-          clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)",
-          x: -30,
-        },
-        {
-          clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-          x: 0,
-          duration: 0.8,
-          ease: "power3.inOut",
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: "top 80%",
+      // Heading reveal - simple fade on mobile, clip-path on desktop
+      if (isMobile) {
+        gsap.fromTo(
+          headingRef.current,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: headingRef.current,
+              start: "top 85%",
+            },
+          }
+        )
+      } else {
+        gsap.fromTo(
+          headingRef.current,
+          {
+            clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)",
+            x: -30,
           },
-        }
-      )
+          {
+            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+            x: 0,
+            duration: 0.8,
+            ease: "power3.inOut",
+            scrollTrigger: {
+              trigger: headingRef.current,
+              start: "top 80%",
+            },
+          }
+        )
+      }
 
       // Paragraphs stagger with highlight effect
       const paragraphs = paragraphsRef.current?.children
@@ -68,13 +87,13 @@ export function AboutSection() {
           paragraphs,
           {
             opacity: 0,
-            y: 40,
+            y: isMobile ? 20 : 40,
           },
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            stagger: 0.2,
+            duration: isMobile ? 0.5 : 0.7,
+            stagger: isMobile ? 0.15 : 0.2,
             ease: "power2.out",
             scrollTrigger: {
               trigger: paragraphsRef.current,
@@ -84,28 +103,30 @@ export function AboutSection() {
         )
       }
 
-      // Highlight spans animation
-      const highlights = sectionRef.current?.querySelectorAll(".highlight-text")
-      highlights?.forEach((highlight, index) => {
-        gsap.fromTo(
-          highlight,
-          {
-            backgroundSize: "0% 100%",
-          },
-          {
-            backgroundSize: "100% 100%",
-            duration: 0.6,
-            delay: 0.3 + index * 0.15,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: highlight,
-              start: "top 85%",
+      // Highlight spans animation (skip on mobile - expensive)
+      if (!isMobile) {
+        const highlights = sectionRef.current?.querySelectorAll(".highlight-text")
+        highlights?.forEach((highlight, index) => {
+          gsap.fromTo(
+            highlight,
+            {
+              backgroundSize: "0% 100%",
             },
-          }
-        )
-      })
+            {
+              backgroundSize: "100% 100%",
+              duration: 0.6,
+              delay: 0.3 + index * 0.15,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: highlight,
+                start: "top 85%",
+              },
+            }
+          )
+        })
+      }
 
-      // Feature tags bounce in
+      // Feature tags bounce in (simplified on mobile)
       const tags = tagsRef.current?.children
       if (tags) {
         gsap.fromTo(
@@ -113,15 +134,15 @@ export function AboutSection() {
           {
             opacity: 0,
             scale: 0,
-            rotation: -10,
+            rotation: isMobile ? 0 : -10,
           },
           {
             opacity: 1,
             scale: 1,
             rotation: 0,
-            duration: 0.5,
+            duration: isMobile ? 0.4 : 0.5,
             stagger: 0.1,
-            ease: "back.out(1.7)",
+            ease: isMobile ? "power2.out" : "back.out(1.7)",
             scrollTrigger: {
               trigger: tagsRef.current,
               start: "top 85%",
@@ -130,34 +151,36 @@ export function AboutSection() {
         )
       }
 
-      // Parallax for tape decorations
-      const tapes = sectionRef.current?.querySelectorAll(".tape-decoration")
-      tapes?.forEach((tape, index) => {
-        gsap.to(tape, {
-          y: index % 2 === 0 ? -20 : 20,
-          rotation: index % 2 === 0 ? -5 : 5,
+      // Parallax for tape decorations - DESKTOP ONLY
+      if (!isMobile) {
+        const tapes = sectionRef.current?.querySelectorAll(".tape-decoration")
+        tapes?.forEach((tape, index) => {
+          gsap.to(tape, {
+            y: index % 2 === 0 ? -20 : 20,
+            rotation: index % 2 === 0 ? -5 : 5,
+            ease: "none",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1.5,
+            },
+          })
+        })
+
+        // Card subtle parallax tilt on scroll - DESKTOP ONLY
+        gsap.to(cardRef.current, {
+          rotateY: 2,
+          rotateX: -2,
           ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top bottom",
             end: "bottom top",
-            scrub: 1.5,
+            scrub: 2,
           },
         })
-      })
-
-      // Card subtle parallax tilt on scroll
-      gsap.to(cardRef.current, {
-        rotateY: 2,
-        rotateX: -2,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 2,
-        },
-      })
+      }
 
     }, sectionRef)
 
@@ -188,9 +211,9 @@ export function AboutSection() {
             <p>
               <strong className="text-violet-600">DEVOLUTION</strong> is GDG DAU&apos;s flagship tech event. It&apos;s
               not just a conference; it&apos;s a{" "}
-              <span 
+              <span
                 className="highlight-text bg-yellow-400 px-2 font-bold"
-                style={{ 
+                style={{
                   backgroundImage: "linear-gradient(to right, rgb(250 204 21) 0%, rgb(250 204 21) 100%)",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "left center",
@@ -202,9 +225,9 @@ export function AboutSection() {
             </p>
             <p>
               Join us for{" "}
-              <span 
+              <span
                 className="highlight-text bg-cyan-400 px-2 font-bold"
-                style={{ 
+                style={{
                   backgroundImage: "linear-gradient(to right, rgb(34 211 238) 0%, rgb(34 211 238) 100%)",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "left center",
@@ -213,9 +236,9 @@ export function AboutSection() {
                 workshops
               </span>
               ,
-              <span 
+              <span
                 className="highlight-text bg-fuchsia-500 text-white px-2 font-bold ml-1"
-                style={{ 
+                style={{
                   backgroundImage: "linear-gradient(to right, rgb(217 70 239) 0%, rgb(217 70 239) 100%)",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "left center",
@@ -224,9 +247,9 @@ export function AboutSection() {
                 hackathons
               </span>
               , and
-              <span 
+              <span
                 className="highlight-text bg-lime-400 px-2 font-bold ml-1"
-                style={{ 
+                style={{
                   backgroundImage: "linear-gradient(to right, rgb(163 230 53) 0%, rgb(163 230 53) 100%)",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "left center",

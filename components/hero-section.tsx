@@ -6,6 +6,7 @@ import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Sparkles, Zap, Star, Cloud, Code, Rocket } from "lucide-react"
 import { GDGLogo } from "./gdg-logo"
+import { getDeviceCapabilities } from "@/lib/mobile-optimization"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -24,9 +25,16 @@ export function HeroSection() {
   useEffect(() => {
     if (!sectionRef.current) return
 
-    const isMobile = window.innerWidth < 768
-    
-    const ctx = gsap.context(() => {
+    const { isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
+
+    const mm = gsap.matchMedia()
+
+    mm.add({
+      isMobile: "(max-width: 767px)",
+      isDesktop: "(min-width: 768px)",
+    }, (context) => {
+      const { isMobile } = context.conditions as { isMobile: boolean }
+
       // Master timeline for orchestrated entrance
       const masterTL = gsap.timeline({
         defaults: { ease: "power3.out" }
@@ -55,80 +63,70 @@ export function HeroSection() {
         "-=0.4"
       )
 
-      // Title entrance - 3D character flip animation
+      // Title entrance - 3D character flip animation (simplified on mobile)
       const devoChars = devoCharsRef.current.filter(Boolean)
       const lutionChars = lutionCharsRef.current.filter(Boolean)
 
       if (devoChars.length && lutionChars.length && yearRef.current) {
-        // DEVO - characters flip in from bottom with 3D rotation
+        // DEVO - characters flip in from bottom (no 3D on mobile)
+        const fromState = isLowEndDevice || isMobile
+          ? { y: 60, opacity: 0, scale: 0.8 }
+          : { y: 120, opacity: 0, rotateX: -90, scale: 0.5, transformOrigin: "bottom center" }
+
+        const toState = isLowEndDevice || isMobile
+          ? { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.05, ease: "power2.out" }
+          : { y: 0, opacity: 1, rotateX: 0, scale: 1, duration: 0.8, stagger: 0.08, ease: "back.out(1.7)" }
+
         masterTL.fromTo(
           devoChars,
-          { 
-            y: 120,
-            opacity: 0,
-            rotateX: -90,
-            scale: 0.5,
-            transformOrigin: "bottom center",
-          },
-          { 
-            y: 0,
-            opacity: 1,
-            rotateX: 0,
-            scale: 1,
-            duration: 0.8,
-            stagger: 0.08,
-            ease: "back.out(1.7)",
-          },
+          fromState,
+          toState,
           "-=0.3"
         )
 
-        // LUTION - characters flip in with slight delay
+        // LUTION - characters flip in with slight delay (simplified on mobile)
+        const lutionFrom = isLowEndDevice || isMobile
+          ? { y: 60, opacity: 0, scale: 0.8 }
+          : { y: 120, opacity: 0, rotateX: -90, scale: 0.5, transformOrigin: "bottom center" }
+
+        const lutionTo = isLowEndDevice || isMobile
+          ? { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.04, ease: "power2.out" }
+          : { y: 0, opacity: 1, rotateX: 0, scale: 1, duration: 0.8, stagger: 0.06, ease: "back.out(1.7)" }
+
         masterTL.fromTo(
           lutionChars,
-          { 
-            y: 120,
-            opacity: 0,
-            rotateX: -90,
-            scale: 0.5,
-            transformOrigin: "bottom center",
-          },
-          { 
-            y: 0,
-            opacity: 1,
-            rotateX: 0,
-            scale: 1,
-            duration: 0.8,
-            stagger: 0.06,
-            ease: "back.out(1.7)",
-          },
+          lutionFrom,
+          lutionTo,
           "-=0.6"
         )
 
-        // Add a subtle bounce wave after reveal
-        masterTL.to([...devoChars, ...lutionChars], {
-          y: -8,
-          duration: 0.2,
-          stagger: 0.03,
-          ease: "power2.out",
-        }, "-=0.2")
-        
-        masterTL.to([...devoChars, ...lutionChars], {
-          y: 0,
-          duration: 0.4,
-          stagger: 0.03,
-          ease: "bounce.out",
-        })
+        // Add a subtle bounce wave after reveal (skip on low-end)
+        if (!isLowEndDevice && !prefersReducedMotion) {
+          masterTL.to([...devoChars, ...lutionChars], {
+            y: -8,
+            duration: 0.2,
+            stagger: 0.03,
+            ease: "power2.out",
+          }, "-=0.2")
+
+          masterTL.to([...devoChars, ...lutionChars], {
+            y: 0,
+            duration: 0.4,
+            stagger: 0.03,
+            ease: "bounce.out",
+          })
+        }
 
         // Year with elastic pop
         masterTL.fromTo(
           yearRef.current,
           { scale: 0, opacity: 0, y: 40, rotateX: -45 },
-          { 
-            scale: 1, 
-            opacity: 1, 
+          {
+            scale: 1,
+            opacity: 1,
             y: 0,
             rotateX: 0,
-            duration: 1, 
+            duration: 1,
             ease: "elastic.out(1, 0.5)",
           },
           "-=0.8"
@@ -138,19 +136,19 @@ export function HeroSection() {
       // Subtitle card - 3D flip in
       masterTL.fromTo(
         subtitleRef.current,
-        { 
-          rotateX: -90, 
-          opacity: 0, 
+        {
+          rotateX: -90,
+          opacity: 0,
           y: -20,
           transformOrigin: "top center"
         },
-        { 
-          rotateX: 0, 
-          opacity: 1, 
-          y: 0, 
-          rotate: 1, 
-          duration: 0.8, 
-          ease: "back.out(1.4)" 
+        {
+          rotateX: 0,
+          opacity: 1,
+          y: 0,
+          rotate: 1,
+          duration: 0.8,
+          ease: "back.out(1.4)"
         },
         "-=0.4"
       )
@@ -160,18 +158,18 @@ export function HeroSection() {
         const cards = dateCardsRef.current.children
         masterTL.fromTo(
           cards,
-          { 
-            y: 60, 
-            opacity: 0, 
+          {
+            y: 60,
+            opacity: 0,
             scale: 0.5,
             rotateZ: (i) => (i === 0 ? -15 : 15),
           },
-          { 
-            y: 0, 
-            opacity: 1, 
+          {
+            y: 0,
+            opacity: 1,
             scale: 1,
             rotateZ: (i) => (i === 0 ? -3 : 2),
-            duration: 0.7, 
+            duration: 0.7,
             stagger: 0.2,
             ease: "elastic.out(1, 0.5)"
           },
@@ -188,48 +186,53 @@ export function HeroSection() {
       )
 
       // Add pulsing glow to CTA
-      masterTL.to(ctaRef.current?.querySelector("a"), {
-        boxShadow: "0 0 20px rgba(250, 204, 21, 0.5), 0 0 40px rgba(250, 204, 21, 0.3)",
-        duration: 1,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      })
+      const ctaLink = ctaRef.current?.querySelector("a")
+      if (ctaLink) {
+        masterTL.to(ctaLink, {
+          boxShadow: "0 0 20px rgba(250, 204, 21, 0.5), 0 0 40px rgba(250, 204, 21, 0.3)",
+          duration: 1,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        })
+      }
 
-      // Floating stickers entrance with physics-like bounce
+      // Floating stickers entrance with physics-like bounce (simplified on mobile)
       const stickers = sectionRef.current?.querySelectorAll(".floating-sticker")
-      if (stickers && stickers.length > 0) {
+      if (stickers && stickers.length > 0 && !isLowEndDevice) {
         stickers.forEach((sticker, index) => {
           masterTL.fromTo(
             sticker,
-            { 
-              scale: 0, 
-              opacity: 0, 
-              rotation: -30 + Math.random() * 60,
-              y: -100,
+            {
+              scale: 0,
+              opacity: 0,
+              rotation: isMobile ? 0 : -30 + Math.random() * 60,
+              y: isMobile ? -50 : -100,
             },
-            { 
-              scale: 1, 
-              opacity: 1, 
-              rotation: 0, 
+            {
+              scale: 1,
+              opacity: 1,
+              rotation: 0,
               y: 0,
-              duration: 0.8, 
-              ease: "bounce.out",
+              duration: isMobile ? 0.5 : 0.8,
+              ease: isMobile ? "power2.out" : "bounce.out",
             },
             `-=${0.6 - index * 0.1}`
           )
 
-          // Continuous floating animation
-          gsap.to(sticker, {
-            y: "random(-15, 15)",
-            x: "random(-10, 10)",
-            rotation: "random(-8, 8)",
-            duration: "random(2, 4)",
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut",
-            delay: index * 0.3,
-          })
+          // Continuous floating animation (skip on mobile)
+          if (!isMobile && !prefersReducedMotion) {
+            gsap.to(sticker, {
+              y: "random(-15, 15)",
+              x: "random(-10, 10)",
+              rotation: "random(-8, 8)",
+              duration: "random(2, 4)",
+              repeat: -1,
+              yoyo: true,
+              ease: "sine.inOut",
+              delay: index * 0.3,
+            })
+          }
         })
       }
 
@@ -255,7 +258,7 @@ export function HeroSection() {
         shapes?.forEach((shape, index) => {
           const speed = 0.15 + (index * 0.1)
           const direction = index % 2 === 0 ? 1 : -1
-          
+
           gsap.to(shape, {
             y: 120 * speed * direction,
             x: 30 * speed * -direction,
@@ -282,21 +285,20 @@ export function HeroSection() {
           scrub: 2,
         },
       })
+    })
 
-    }, sectionRef)
-
-    return () => ctx.revert()
+    return () => mm.revert()
   }, [])
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative min-h-screen pt-24 md:pt-32 pb-16 px-4 overflow-hidden"
       style={{ perspective: "1200px" }}
     >
       {/* Animated background gradient layers */}
       <div className="absolute inset-0 -z-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-yellow-400/5 to-cyan-400/10" />
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-yellow-400/5 to-cyan-400/10" />
         {/* Moving gradient orbs */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
@@ -309,19 +311,19 @@ export function HeroSection() {
           <Sparkles className="w-6 h-6 text-black" />
         </FloatingSticker>
       </div>
-      
+
       <div className="parallax-shape absolute top-32 right-[8%] hidden md:block">
         <FloatingSticker className="-rotate-6" color="bg-yellow-400">
           <Zap className="w-6 h-6 text-black" />
         </FloatingSticker>
       </div>
-      
+
       <div className="parallax-shape absolute bottom-40 left-[10%] hidden md:block">
         <FloatingSticker className="rotate-6" color="bg-lime-400">
           <Star className="w-6 h-6 text-black" />
         </FloatingSticker>
       </div>
-      
+
       <div className="parallax-shape absolute top-48 left-[15%] hidden lg:block">
         <FloatingSticker className="-rotate-12" color="bg-pink-400">
           <Cloud className="w-6 h-6 text-black" />
@@ -341,7 +343,7 @@ export function HeroSection() {
       </div>
 
       {/* Grid pattern overlay for texture */}
-      <div 
+      <div
         className="absolute inset-0 -z-10 opacity-[0.02] pointer-events-none"
         style={{
           backgroundImage: `
@@ -358,7 +360,7 @@ export function HeroSection() {
         <div ref={badgeRef} className="inline-block mb-6">
           <div className="bg-violet-500 text-white border-[3px] border-black px-5 py-2 brutal-shadow rotate-2 relative overflow-hidden group cursor-pointer hover:scale-105 transition-transform" data-magnetic="0.2">
             {/* Shine effect */}
-            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent" />
             <span className="font-bold uppercase tracking-wider text-sm">✦ Organized by GDG DAU ✦</span>
           </div>
         </div>
@@ -389,7 +391,7 @@ export function HeroSection() {
                   key={`devo-${index}`}
                   ref={(el) => { devoCharsRef.current[index] = el }}
                   className="inline-block hover:scale-110 hover:-translate-y-2 transition-transform duration-200 cursor-default"
-                  style={{ 
+                  style={{
                     color: gdgColors[index % 4],
                     willChange: "transform, opacity",
                     transformStyle: "preserve-3d",
@@ -409,7 +411,7 @@ export function HeroSection() {
                   key={`lution-${index}`}
                   ref={(el) => { lutionCharsRef.current[index] = el }}
                   className="inline-block hover:scale-110 hover:-translate-y-2 transition-transform duration-200 cursor-default"
-                  style={{ 
+                  style={{
                     color: gdgColors[(index + 4) % 4], // Continue pattern
                     willChange: "transform, opacity",
                     transformStyle: "preserve-3d",
@@ -421,14 +423,14 @@ export function HeroSection() {
             })}
           </span>
           <br />
-          <span 
-            ref={yearRef} 
+          <span
+            ref={yearRef}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white inline-block relative"
             style={{ transformStyle: "preserve-3d" }}
           >
             2026
             {/* Year underline animation - gradient with all GDG colors */}
-            <span 
+            <span
               className="absolute -bottom-2 left-0 w-0 h-1 animate-[expand_0.5s_ease-out_2s_forwards]"
               style={{ background: "linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853)" }}
             />
@@ -469,7 +471,7 @@ export function HeroSection() {
             className="inline-block bg-black text-white border-[3px] border-black px-8 md:px-10 py-3 md:py-4 font-bold text-lg md:text-xl uppercase tracking-wide brutal-shadow-lg hover:bg-yellow-400 hover:text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] relative overflow-hidden group"
           >
             {/* Button shine effect */}
-            <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-500 bg-linear-to-r from-transparent via-white/20 to-transparent" />
             <span className="relative">Get Notified →</span>
           </a>
         </div>

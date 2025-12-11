@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Brain, Link, Cloud, Smartphone, Database, Shield } from "lucide-react"
+import { getDeviceCapabilities, getRAFInterval } from "@/lib/mobile-optimization"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -66,24 +67,32 @@ export function HorizontalScrollSection() {
   const mobileCardsRef = useRef<HTMLDivElement[]>([])
   const headingRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    // Check if mobile on mount
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-    checkMobile()
-    window.addEventListener("resize", checkMobile)
-    return () => window.removeEventListener("resize", checkMobile)
+    setMounted(true)
+    const mm = gsap.matchMedia()
+
+    mm.add({
+      isMobile: "(max-width: 767px)",
+      isDesktop: "(min-width: 768px)",
+    }, (context) => {
+      const { isMobile } = context.conditions as { isMobile: boolean }
+      setIsMobile(isMobile)
+    })
+
+    return () => mm.revert()
   }, [])
 
   useEffect(() => {
     if (!sectionRef.current) return
 
+    const { isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
+
     const ctx = gsap.context(() => {
       if (isMobile) {
         // MOBILE: Vertical scroll with staggered card animations
-        
+
         // Heading animation
         if (headingRef.current) {
           gsap.fromTo(
@@ -186,7 +195,7 @@ export function HorizontalScrollSection() {
                 const center = 0.5
                 const diff = self.progress - center
                 const rotation = diff * -20
-                
+
                 gsap.set(card, {
                   rotateY: rotation,
                   scale: 1 - Math.abs(diff) * 0.1,
@@ -229,6 +238,12 @@ export function HorizontalScrollSection() {
     return () => ctx.revert()
   }, [isMobile])
 
+  // Prevent hydration mismatch - always render desktop layout on server
+  // Client will switch to mobile layout after mount if needed
+  if (!mounted) {
+    return null
+  }
+
   // Mobile Layout - Vertical scrolling cards
   if (isMobile) {
     return (
@@ -248,8 +263,8 @@ export function HorizontalScrollSection() {
         <div className="relative z-10 max-w-lg mx-auto">
           {/* Heading */}
           <div ref={headingRef} className="text-center mb-10">
-            <h2 className="font-(--font-display) text-4xl font-black text-white uppercase mb-4">
-              <span className="bg-gradient-to-r from-yellow-400 via-fuchsia-500 to-cyan-400 bg-clip-text text-transparent">
+            <h2 className="font-(--font-display) text-4xl text-white uppercase mb-4">
+              <span className="bg-linear-to-r from-yellow-400 via-fuchsia-500 to-cyan-400 bg-clip-text text-transparent">
                 Event
               </span>{" "}
               Tracks
@@ -273,7 +288,7 @@ export function HorizontalScrollSection() {
                 }}
               >
                 {/* Card number */}
-                <div className="absolute top-2 right-3 font-(--font-display) text-5xl font-black text-current opacity-10">
+                <div className="absolute top-2 right-3 font-(--font-display) text-5xl text-current opacity-10">
                   0{index + 1}
                 </div>
 
@@ -284,7 +299,7 @@ export function HorizontalScrollSection() {
                   </div>
 
                   {/* Title */}
-                  <h3 className="font-(--font-display) text-2xl font-black uppercase mb-2">
+                  <h3 className="font-(--font-display) text-2xl uppercase mb-2">
                     {track.title}
                   </h3>
 
@@ -324,7 +339,7 @@ export function HorizontalScrollSection() {
       <div className="fixed top-0 left-0 right-0 h-1 bg-black/20 z-50 hidden md:block">
         <div
           ref={progressRef}
-          className="h-full origin-left bg-gradient-to-r from-yellow-400 via-fuchsia-500 to-cyan-400"
+          className="h-full origin-left bg-linear-to-r from-yellow-400 via-fuchsia-500 to-cyan-400"
           style={{ transform: "scaleX(0)" }}
         />
       </div>
@@ -334,9 +349,9 @@ export function HorizontalScrollSection() {
         <div className="parallax-bg-element absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-yellow-400/10 blur-3xl" />
         <div className="parallax-bg-element absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-fuchsia-500/10 blur-3xl" />
         <div className="parallax-bg-element absolute top-1/2 left-1/2 w-80 h-80 rounded-full bg-cyan-400/10 blur-3xl" />
-        
+
         {/* Grid pattern */}
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `
@@ -350,10 +365,11 @@ export function HorizontalScrollSection() {
 
       {/* Main content */}
       <div className="relative min-h-screen flex items-center">
+
         {/* Section header - fixed on left */}
-        <div className="fixed left-8 top-1/2 -translate-y-1/2 z-20 hidden lg:block">
-          <div className="transform -rotate-90 origin-left whitespace-nowrap">
-            <span className="font-(--font-display) text-6xl font-black text-white/10 uppercase tracking-widest">
+        <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 hidden lg:block">
+          <div className="transform -rotate-90 origin-bottom-left whitespace-nowrap translate-y-1/2">
+            <span className="font-(--font-display) text-6xl text-white/10 uppercase tracking-widest">
               Event Tracks
             </span>
           </div>
@@ -366,10 +382,10 @@ export function HorizontalScrollSection() {
           style={{ transformStyle: "preserve-3d" }}
         >
           {/* Intro card */}
-          <div className="flex-shrink-0 w-[60vw] lg:w-[40vw] flex items-center justify-center">
+          <div className="shrink-0 w-[60vw] lg:w-[40vw] flex items-center justify-center">
             <div className="text-center">
-              <h2 className="font-(--font-display) text-5xl lg:text-7xl font-black text-white uppercase mb-6">
-                <span className="bg-gradient-to-r from-yellow-400 via-fuchsia-500 to-cyan-400 bg-clip-text text-transparent">
+              <h2 className="font-(--font-display) text-5xl lg:text-7xl text-white uppercase mb-6">
+                <span className="bg-linear-to-r from-yellow-400 via-fuchsia-500 to-cyan-400 bg-clip-text text-transparent">
                   Event
                 </span>
                 <br />
@@ -394,14 +410,14 @@ export function HorizontalScrollSection() {
               ref={(el) => {
                 if (el) cardsRef.current[index] = el
               }}
-              className={`flex-shrink-0 w-[50vw] lg:w-[35vw] ${track.color} ${track.textColor} border-4 border-black p-8 lg:p-12 brutal-shadow-lg relative overflow-hidden group`}
+              className={`shrink-0 w-[50vw] lg:w-[35vw] ${track.color} ${track.textColor} border-4 border-black p-8 lg:p-12 brutal-shadow-lg relative overflow-hidden group`}
               style={{
                 transformStyle: "preserve-3d",
                 transform: `rotate(${(index % 2 === 0 ? -2 : 2)}deg)`,
               }}
             >
               {/* Animated gradient overlay on hover */}
-              <div 
+              <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500"
                 style={{
                   background: `radial-gradient(circle at 50% 50%, white 0%, transparent 70%)`,
@@ -413,7 +429,7 @@ export function HorizontalScrollSection() {
               <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/10 blur-xl" />
 
               {/* Card number */}
-              <div className="absolute top-4 right-4 font-(--font-display) text-6xl lg:text-8xl font-black text-current opacity-10">
+              <div className="absolute top-4 right-4 font-(--font-display) text-6xl lg:text-8xl text-current opacity-10">
                 0{index + 1}
               </div>
 
@@ -424,7 +440,7 @@ export function HorizontalScrollSection() {
                 </div>
 
                 {/* Title */}
-                <h3 className="font-(--font-display) text-3xl lg:text-5xl font-black uppercase mb-4">
+                <h3 className="font-(--font-display) text-3xl lg:text-5xl uppercase mb-4">
                   {track.title}
                 </h3>
 
@@ -436,10 +452,10 @@ export function HorizontalScrollSection() {
                 {/* Arrow */}
                 <div className="mt-8 flex items-center gap-3 opacity-50 group-hover:opacity-100 transition-colors">
                   <span className="font-bold uppercase tracking-wider">Explore Track</span>
-                  <svg 
-                    className="w-6 h-6 transform group-hover:translate-x-2 transition-transform" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
+                  <svg
+                    className="w-6 h-6 transform group-hover:translate-x-2 transition-transform"
+                    fill="none"
+                    viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -454,9 +470,9 @@ export function HorizontalScrollSection() {
           ))}
 
           {/* End card */}
-          <div className="flex-shrink-0 w-[50vw] lg:w-[35vw] flex items-center justify-center">
+          <div className="shrink-0 w-[50vw] lg:w-[35vw] flex items-center justify-center">
             <div className="text-center">
-              <h3 className="font-(--font-display) text-4xl lg:text-5xl font-black text-white uppercase mb-4">
+              <h3 className="font-(--font-display) text-4xl lg:text-5xl text-white uppercase mb-4">
                 Ready to<br />
                 <span className="text-yellow-400">Join?</span>
               </h3>

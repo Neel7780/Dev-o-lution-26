@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Twitter, Sparkles } from "lucide-react"
+import { getDeviceCapabilities } from "@/lib/mobile-optimization"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -18,6 +19,8 @@ export function JoinTheConversation() {
 
   useEffect(() => {
     if (!sectionRef.current || !cardRef.current) return
+    
+    const { isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
 
     const ctx = gsap.context(() => {
       const isMobile = window.innerWidth < 768

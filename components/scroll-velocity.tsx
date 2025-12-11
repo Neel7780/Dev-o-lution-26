@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useMemo } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { getDeviceCapabilities, getRAFInterval } from "@/lib/mobile-optimization"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -24,38 +25,68 @@ export function ScrollVelocityText({
   const velocityRef = useRef(0)
   const scrollVelocityRef = useRef(0)
   const xRef = useRef(0)
-  const directionFactor = useRef(direction === "left" ? -1 : 1)
+  const directionFactorRef = useRef(direction === "left" ? -1 : 1)
+  const lastVelocityUpdateRef = useRef(0)
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
+
+  // Memoize repeated text to avoid recreating
+  const repeatedText = useMemo(() => Array(4).fill(children).join(" • "), [children])
 
   useEffect(() => {
     if (!containerRef.current || !textRef.current) return
 
-    const textWidth = textRef.current.offsetWidth / 4 // Divide by number of repetitions
-    let animationFrameId: number
+    const { isMobile, prefersReducedMotion } = getDeviceCapabilities()
+    const rafInterval = getRAFInterval()
 
-    // Track scroll velocity
-    ScrollTrigger.create({
-      trigger: document.body,
-      start: "top top",
-      end: "bottom bottom",
-      onUpdate: (self) => {
-        scrollVelocityRef.current = self.getVelocity() / 1000
-      },
-    })
+    // Disable on reduced motion preference
+    if (prefersReducedMotion) return
+
+    const textWidth = textRef.current.offsetWidth / 4
+    let animationFrameId: number
+    let lastFrameTime = performance.now()
+    let frameCount = 0
+
+    // Create single ScrollTrigger instance
+    if (!scrollTriggerRef.current) {
+      scrollTriggerRef.current = ScrollTrigger.create({
+        trigger: document.body,
+        start: "top top",
+        end: "bottom bottom",
+        onUpdate: (self) => {
+          scrollVelocityRef.current = self.getVelocity() / 1000
+          lastVelocityUpdateRef.current = performance.now()
+        },
+      })
+    }
 
     const animate = () => {
-      // Calculate velocity with scroll influence
-      const targetVelocity = baseVelocity + Math.abs(scrollVelocityRef.current) * 5
-      velocityRef.current += (targetVelocity - velocityRef.current) * 0.1
+      frameCount++
+
+      // Limit frame rate on mobile devices
+      if (frameCount % rafInterval !== 0) {
+        animationFrameId = requestAnimationFrame(animate)
+        return
+      }
+
+      const now = performance.now()
+      const deltaTime = (now - lastFrameTime) / 1000
+
+      // Only update if velocity was recently changed (optimization)
+      if (now - lastVelocityUpdateRef.current < (isMobile ? 150 : 100)) {
+        // Calculate velocity with scroll influence
+        const targetVelocity = baseVelocity + Math.abs(scrollVelocityRef.current) * 5
+        velocityRef.current += (targetVelocity - velocityRef.current) * 0.1
+      }
 
       // Update direction based on scroll
       if (scrollVelocityRef.current < -1) {
-        directionFactor.current = direction === "left" ? -1 : 1
+        directionFactorRef.current = direction === "left" ? -1 : 1
       } else if (scrollVelocityRef.current > 1) {
-        directionFactor.current = direction === "left" ? 1 : -1
+        directionFactorRef.current = direction === "left" ? 1 : -1
       }
 
-      // Update position
-      xRef.current += velocityRef.current * directionFactor.current * 0.016 // 60fps
+      // Update position with delta time for smooth animation
+      xRef.current += velocityRef.current * directionFactorRef.current * deltaTime * 100
 
       // Loop the text
       if (xRef.current <= -textWidth) {
@@ -68,6 +99,7 @@ export function ScrollVelocityText({
         x: xRef.current,
       })
 
+      lastFrameTime = now
       animationFrameId = requestAnimationFrame(animate)
     }
 
@@ -79,8 +111,6 @@ export function ScrollVelocityText({
   }, [baseVelocity, direction])
 
   // Create 4 repetitions for seamless loop
-  const repeatedText = Array(4).fill(children).join(" • ")
-
   return (
     <div ref={containerRef} className={`overflow-hidden whitespace-nowrap ${className}`}>
       <div
@@ -103,28 +133,34 @@ interface SkewOnScrollProps {
 
 export function SkewOnScroll({ children, className = "", maxSkew = 10 }: SkewOnScrollProps) {
   const elementRef = useRef<HTMLDivElement>(null)
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
 
   useEffect(() => {
     if (!elementRef.current) return
 
-    ScrollTrigger.create({
-      trigger: document.body,
-      start: "top top",
-      end: "bottom bottom",
-      onUpdate: (self) => {
-        const velocity = self.getVelocity()
-        const skew = gsap.utils.clamp(-maxSkew, maxSkew, velocity / 300)
-        
-        gsap.to(elementRef.current, {
-          skewY: skew,
-          duration: 0.5,
-          ease: "power2.out",
-        })
-      },
-    })
+    // Reuse single ScrollTrigger if possible
+    if (!scrollTriggerRef.current) {
+      scrollTriggerRef.current = ScrollTrigger.create({
+        trigger: document.body,
+        start: "top top",
+        end: "bottom bottom",
+        onUpdate: (self) => {
+          const velocity = self.getVelocity()
+          const skew = gsap.utils.clamp(-maxSkew, maxSkew, velocity / 300)
+
+          gsap.to(elementRef.current, {
+            skewY: skew,
+            duration: 0.5,
+            ease: "power2.out",
+          })
+        },
+      })
+    }
 
     return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill())
+      // Kill only the specific trigger, not all
+      scrollTriggerRef.current?.kill()
+      scrollTriggerRef.current = null
     }
   }, [maxSkew])
 
@@ -145,8 +181,34 @@ export function VelocityScrollSection() {
   useEffect(() => {
     if (!sectionRef.current) return
 
+    const isMobile = window.innerWidth < 768
+    const { prefersReducedMotion } = getDeviceCapabilities()
+
     const ctx = gsap.context(() => {
-      // Create velocity-based animations for each line
+      // On mobile: simple fade in, no velocity-based animations
+      if (isMobile || prefersReducedMotion) {
+        [line1Ref, line2Ref, line3Ref].forEach((ref, index) => {
+          if (!ref.current) return
+
+          gsap.fromTo(
+            ref.current,
+            { opacity: 0 },
+            {
+              opacity: 1,
+              duration: 0.8,
+              delay: index * 0.2,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 80%",
+              },
+            }
+          )
+        })
+        return
+      }
+
+      // Desktop: Full velocity-based animations
       [line1Ref, line2Ref, line3Ref].forEach((ref, index) => {
         if (!ref.current) return
 
@@ -163,11 +225,11 @@ export function VelocityScrollSection() {
           onUpdate: (self) => {
             const velocity = self.getVelocity()
             const progress = self.progress
-            
+
             // Calculate x position based on scroll progress and velocity
             const baseX = (progress - 0.5) * speed * direction
             const velocityInfluence = velocity / 500 * direction
-            
+
             gsap.to(ref.current, {
               x: baseX + velocityInfluence,
               duration: 0.5,
@@ -192,24 +254,24 @@ export function VelocityScrollSection() {
       <div className="space-y-4 md:space-y-8">
         <div
           ref={line1Ref}
-          className="font-(--font-display) text-6xl md:text-8xl lg:text-9xl font-black text-transparent uppercase whitespace-nowrap"
+          className="font-(--font-display) text-6xl md:text-8xl lg:text-9xl text-transparent uppercase whitespace-nowrap"
           style={{
             WebkitTextStroke: "2px rgba(255,255,255,0.1)",
           }}
         >
           DEVOLUTION • DEVOLUTION • DEVOLUTION • DEVOLUTION •
         </div>
-        
+
         <div
           ref={line2Ref}
-          className="font-(--font-display) text-6xl md:text-8xl lg:text-9xl font-black text-white/5 uppercase whitespace-nowrap"
+          className="font-(--font-display) text-6xl md:text-8xl lg:text-9xl text-white/5 uppercase whitespace-nowrap"
         >
           GDG DAU • GDG DAU • GDG DAU • GDG DAU • GDG DAU •
         </div>
-        
+
         <div
           ref={line3Ref}
-          className="font-(--font-display) text-6xl md:text-8xl lg:text-9xl font-black text-transparent uppercase whitespace-nowrap"
+          className="font-(--font-display) text-6xl md:text-8xl lg:text-9xl text-transparent uppercase whitespace-nowrap"
           style={{
             WebkitTextStroke: "2px rgba(250,204,21,0.2)",
           }}
@@ -221,7 +283,7 @@ export function VelocityScrollSection() {
       {/* Center content */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="text-center pointer-events-auto">
-          <h2 className="font-(--font-display) text-4xl md:text-6xl font-black text-white uppercase mb-4">
+          <h2 className="font-(--font-display) text-4xl md:text-6xl text-white uppercase mb-4">
             Be Part of
             <br />
             <span className="text-yellow-400">Something Big</span>
