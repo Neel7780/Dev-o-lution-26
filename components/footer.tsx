@@ -95,7 +95,7 @@ export function Footer() {
               <h3 className="font-[var(--font-display)] text-3xl md:text-4xl font-black uppercase mb-4">
                 <span className="text-yellow-400">DEVOLUTION</span> 2026
               </h3>
-              <p className="text-white/80 text-lg">by GDG DAU</p>
+              <p className="text-white/80 text-lg">by DSC DAU (formerly GDG on Campus DAU)</p>
             </div>
 
             <p className="text-white/60 text-lg flex items-center gap-2">
@@ -145,7 +145,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div ref={bottomRef} className="border-t-2 border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-white/50 text-sm uppercase tracking-wide">© 2026 GDG DAU. All rights reserved.</p>
+          <p className="text-white/50 text-sm uppercase tracking-wide">© 2026 DSC DAU. All rights reserved.</p>
           
           {/* Status Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-800/80 border border-zinc-700/50 backdrop-blur-sm">

@@ -19,8 +19,8 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: "DEVOLUTION 2026 | GDG DAU",
-  description: "Devolution 2026 - Where Coding Meets Chaos & Creativity. GDG DAU's flagship tech conference.",
+  title: "DEVOLUTION 2026 | DSC DAU",
+  description: "Devolution 2026 - Where Coding Meets Chaos & Creativity. DSC DAU's (formerly GDG on Campus DAU) flagship tech conference.",
 }
 
 export default function RootLayout({

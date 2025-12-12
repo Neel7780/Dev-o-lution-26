@@ -43,7 +43,7 @@ const timelineSteps = [
   },
 ]
 
-const marqueeItems = ["Welcome to", "◆", "DEVOLUTION", "◆", "2026", "◆", "GDG DAU", "◆"]
+const marqueeItems = ["Welcome to", "◆", "DEVOLUTION", "◆", "2026", "◆", "DSC DAU", "◆"]
 
 export function TimelineSection() {
   const sectionRef = useRef<HTMLElement>(null)

@@ -209,7 +209,7 @@ export function AboutSection() {
 
           <div ref={paragraphsRef} className="space-y-6 text-lg md:text-xl leading-relaxed text-black">
             <p>
-              <strong className="text-violet-600">DEVOLUTION</strong> is GDG DAU&apos;s flagship tech event. It&apos;s
+              <strong className="text-violet-600">DEVOLUTION</strong> is DSC DAU&apos;s (formerly GDG on Campus DAU) flagship tech event. It&apos;s
               not just a conference; it&apos;s a{" "}
               <span
                 className="highlight-text bg-yellow-400 px-2 font-bold"

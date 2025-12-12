@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { MorphingBackground, FloatingParticles } from "@/components/morphing-background"
+import { MorphingBackground } from "@/components/morphing-background"
 
 /**
  * Wrapper component that only renders heavy background animations on desktop.
@@ -27,7 +27,6 @@ export function DesktopOnlyBackgrounds() {
     return (
         <>
             <MorphingBackground />
-            <FloatingParticles />
         </>
     )
 }

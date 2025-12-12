@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Sparkles, Zap, Star, Cloud, Code, Rocket } from "lucide-react"
 import { GDGLogo } from "./gdg-logo"
 import { getDeviceCapabilities } from "@/lib/mobile-optimization"
+import Image from "next/image"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -296,23 +297,23 @@ export function HeroSection() {
       className="relative min-h-screen pt-24 md:pt-32 pb-16 px-4 overflow-hidden"
       style={{ perspective: "1200px" }}
     >
-      {/* Animated background gradient layers */}
+      {/* Animated background gradient layers
       <div className="absolute inset-0 -z-20">
-        <div className="absolute inset-0 bg-linear-to-b from-transparent via-yellow-400/5 to-cyan-400/10" />
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-yellow-400/5 to-cyan-400/10" /> */}
         {/* Moving gradient orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-pulse" />
+        {/* <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-400/5 rounded-full blur-3xl" />
-      </div>
+      </div> */}
 
       {/* Floating geometric shapes - parallax layers */}
-      <div className="parallax-shape absolute top-20 left-[5%] hidden md:block">
+      {/* <div className="parallax-shape absolute top-20 left-[5%] hidden md:block">
         <FloatingSticker className="rotate-12" color="bg-cyan-400">
           <Sparkles className="w-6 h-6 text-black" />
         </FloatingSticker>
-      </div>
+      </div> */}
 
-      <div className="parallax-shape absolute top-32 right-[8%] hidden md:block">
+      {/* <div className="parallax-shape absolute top-32 right-[8%] hidden md:block">
         <FloatingSticker className="-rotate-6" color="bg-yellow-400">
           <Zap className="w-6 h-6 text-black" />
         </FloatingSticker>
@@ -340,7 +341,7 @@ export function HeroSection() {
         <FloatingSticker className="-rotate-8" color="bg-orange-400">
           <Rocket className="w-6 h-6 text-black" />
         </FloatingSticker>
-      </div>
+      </div> */}
 
       {/* Grid pattern overlay for texture */}
       <div
@@ -361,72 +362,38 @@ export function HeroSection() {
           <div className="bg-violet-500 text-white border-[3px] border-black px-5 py-2 brutal-shadow rotate-2 relative overflow-hidden group cursor-pointer hover:scale-105 transition-transform" data-magnetic="0.2">
             {/* Shine effect */}
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent" />
-            <span className="font-bold uppercase tracking-wider text-sm">✦ Organized by GDG DAU ✦</span>
+            <span className="font-bold uppercase tracking-wider text-sm">✦ Organized by DSC DAU (formerly GDG on Campus DAU) ✦</span>
           </div>
         </div>
 
-        {/* Animated Logo */}
-        <div ref={logoContainerRef} className="flex justify-center mb-6">
-          <GDGLogo size={140} animate={true} delay={0.3} className="drop-shadow-lg" />
-        </div>
-
-        {/* Main Title with 3D character animation - GDG Colors */}
-        <h1
+        {/* Main Title with Dev-o-lution Header Image */}
+        <div
           ref={titleRef}
-          className="font-(--font-display) text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl uppercase leading-none mb-6 tracking-tighter"
+          className="mb-6 flex flex-col items-center"
           style={{
-            WebkitTextStroke: "2px black",
-            textShadow: "5px 5px 0px #000",
             transformStyle: "preserve-3d",
             perspective: "1000px",
           }}
         >
-          {/* DEVOLUTION - each character with GDG colors (Blue, Red, Yellow, Green) */}
-          <span className="inline-block" style={{ perspective: "500px" }}>
-            {["D", "E", "V", "O"].map((char, index) => {
-              // GDG Colors: Blue, Red, Yellow, Green
-              const gdgColors = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"]
-              return (
-                <span
-                  key={`devo-${index}`}
-                  ref={(el) => { devoCharsRef.current[index] = el }}
-                  className="inline-block hover:scale-110 hover:-translate-y-2 transition-transform duration-200 cursor-default"
-                  style={{
-                    color: gdgColors[index % 4],
-                    willChange: "transform, opacity",
-                    transformStyle: "preserve-3d",
-                  }}
-                >
-                  {char}
-                </span>
-              )
-            })}
-          </span>
-          <span className="inline-block" style={{ perspective: "500px" }}>
-            {["L", "U", "T", "I", "O", "N"].map((char, index) => {
-              // Continue GDG Colors cycling from where DEVO left off
-              const gdgColors = ["#4285F4", "#EA4335", "#FBBC05", "#34A853"]
-              return (
-                <span
-                  key={`lution-${index}`}
-                  ref={(el) => { lutionCharsRef.current[index] = el }}
-                  className="inline-block hover:scale-110 hover:-translate-y-2 transition-transform duration-200 cursor-default"
-                  style={{
-                    color: gdgColors[(index + 4) % 4], // Continue pattern
-                    willChange: "transform, opacity",
-                    transformStyle: "preserve-3d",
-                  }}
-                >
-                  {char}
-                </span>
-              )
-            })}
-          </span>
-          <br />
+          {/* DEVOLUTION Header SVG */}
+          <div className="relative w-full max-w-4xl mb-4">
+            <Image
+              src="/Dev-o-lution header.svg"
+              alt="DEVOLUTION 2026"
+              width={1200}
+              height={300}
+              className="w-full h-auto drop-shadow-[5px_5px_0px_#000]"
+              priority
+            />
+          </div>
           <span
             ref={yearRef}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white inline-block relative"
-            style={{ transformStyle: "preserve-3d" }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white inline-block relative font-(--font-display) uppercase"
+            style={{ 
+              transformStyle: "preserve-3d",
+              WebkitTextStroke: "2px black",
+              textShadow: "5px 5px 0px #000",
+            }}
           >
             2026
             {/* Year underline animation - gradient with all GDG colors */}
@@ -435,7 +402,7 @@ export function HeroSection() {
               style={{ background: "linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853)" }}
             />
           </span>
-        </h1>
+        </div>
 
         {/* Subtitle Card */}
         <div ref={subtitleRef} className="relative inline-block mb-10" style={{ transformStyle: "preserve-3d" }}>

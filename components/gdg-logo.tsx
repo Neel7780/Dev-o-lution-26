@@ -53,8 +53,8 @@ export function GDGLogo({ className = "", size = 120, animate = true, delay = 0 
   return (
     <div ref={logoRef} className={`relative ${className}`} style={{ width: size, height: size }}>
       <Image
-        src="/gdg-logo.png"
-        alt="GDG Logo"
+        src="/planet.png"
+        alt="DSC DAU Logo"
         width={size}
         height={size}
         className="object-contain drop-shadow-lg"
@@ -69,8 +69,8 @@ export function GDGLogoSimple({ className = "", size = 40 }: { className?: strin
   return (
     <div className={`relative ${className}`} style={{ width: size, height: size }}>
       <Image
-        src="/gdg-logo.png"
-        alt="GDG Logo"
+        src="/planet.png"
+        alt="DSC DAU Logo"
         width={size}
         height={size}
         className="object-contain"

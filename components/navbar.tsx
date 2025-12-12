@@ -45,7 +45,7 @@ export function Navbar() {
           <GDGLogoSimple size={36} className="transition-transform duration-300 group-hover:scale-110" />
           <div className="bg-yellow-400 border-[3px] border-black px-3 py-1 brutal-shadow transition-transform duration-300 group-hover:-rotate-2 group-hover:scale-105">
             <span className="font-(--font-display) text-lg md:text-xl font-black tracking-tight text-black">
-              GDG DAU
+              DSC DAU
             </span>
           </div>
         </a>

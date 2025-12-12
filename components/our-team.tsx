@@ -201,73 +201,62 @@ export function OurTeam() {
   let memberIndex = 0
 
   return (
-    <section ref={sectionRef} id="our-team" className="py-12 px-4 relative overflow-hidden" style={{ perspective: "1200px" }}>
+    <section ref={sectionRef} id="our-team" className="py-16 md:py-24 px-4 relative overflow-hidden" style={{ perspective: "1200px" }}>
       <div className="max-w-6xl mx-auto">
-        {/* Main content card */}
-        <div 
-          ref={cardRef}
-          className="relative bg-gradient-to-br from-red-300 via-red-400 to-pink-400 dark:from-red-400 dark:to-pink-500 rounded-2xl p-6 md:p-8 lg:p-10 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-          style={{ transformStyle: "preserve-3d" }}
-        >
-          {/* Mac-style window buttons */}
-          <div className="absolute -top-6 left-6 flex items-center gap-2">
-            <span className="mac-button w-3 h-3 rounded-full bg-red-500 border-2 border-black" />
-            <span className="mac-button w-3 h-3 rounded-full bg-yellow-400 border-2 border-black" />
-            <span className="mac-button w-3 h-3 rounded-full bg-green-500 border-2 border-black" />
-          </div>
-
-          {/* Decorative floating elements */}
-          <div className="absolute top-4 right-4 w-20 h-20 bg-white/10 rounded-full blur-2xl" />
-          <div className="absolute bottom-4 left-4 w-16 h-16 bg-black/10 rounded-full blur-xl" />
-
-          {/* Heading */}
+        {/* Heading */}
+        <div className="text-center mb-12 md:mb-16">
           <h2 
             ref={headingRef}
-            className="font-black text-2xl md:text-3xl lg:text-4xl uppercase mb-8 text-black" 
-            style={{
-              textShadow: '2px 2px 0px rgba(0,0,0,0.2)'
-            }}
+            className="font-(--font-display) text-4xl sm:text-5xl md:text-7xl uppercase inline-block"
           >
-            Our Team
+            <span className="bg-violet-500 text-white px-3 md:px-4 py-2 border-[3px] border-black brutal-shadow -rotate-1 inline-block">
+              Meet Our Team
+            </span>
           </h2>
+        </div>
 
-          {/* Team Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {Object.entries(teamData).map(([teamName, members], colIndex) => (
-              <div 
-                key={teamName} 
-                ref={(el) => {
-                  if (el) columnsRef.current[colIndex] = el
-                }}
-                className="space-y-4 bg-white/10 p-4 rounded-lg border-2 border-black/10 hover:bg-white/20 transition-colors duration-300"
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                {/* Team Name */}
-                <h3 className="font-bold text-lg md:text-xl text-black mb-4 border-b-2 border-black/20 pb-2">
+        {/* Team Grid */}
+        <div 
+          ref={cardRef}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          {Object.entries(teamData).map(([teamName, members], colIndex) => (
+            <div 
+              key={teamName} 
+              ref={(el) => {
+                if (el) columnsRef.current[colIndex] = el
+              }}
+              className="bg-pink-400 border-[3px] border-black brutal-shadow-lg hover:shadow-[8px_8px_0px_0px_#000] hover:-translate-y-1 transition-all duration-300 cursor-default"
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              {/* Team Name Header */}
+              <div className="bg-black text-white px-4 py-3 border-b-[3px] border-black">
+                <h3 className="font-black text-sm md:text-base uppercase tracking-wide">
                   {teamName}
                 </h3>
-                
-                {/* Team Members */}
-                <ul className="space-y-3">
-                  {members.map((member) => {
-                    const currentIndex = memberIndex++
-                    return (
-                      <li 
-                        key={member} 
-                        ref={(el) => {
-                          if (el) membersRef.current[currentIndex] = el
-                        }}
-                        className="font-mono text-xs md:text-sm text-black cursor-default transition-colors duration-200 flex items-center gap-2"
-                      >
-                        <span className="w-1.5 h-1.5 bg-black rounded-full flex-shrink-0" />
-                        {member}
-                      </li>
-                    )
-                  })}
-                </ul>
               </div>
-            ))}
-          </div>
+              
+              {/* Team Members */}
+              <ul className="p-5 space-y-3">
+                {members.map((member) => {
+                  const currentIndex = memberIndex++
+                  return (
+                    <li 
+                      key={member} 
+                      ref={(el) => {
+                        if (el) membersRef.current[currentIndex] = el
+                      }}
+                      className="font-mono text-xs md:text-sm text-black hover:text-violet-600 transition-colors duration-200 flex items-center gap-2 group font-semibold"
+                    >
+                      <span className="w-2 h-2 bg-black group-hover:bg-violet-600 transition-colors shrink-0" />
+                      <span>{member}</span>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     </section>

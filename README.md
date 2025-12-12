@@ -1,10 +1,10 @@
 # DEVOLUTION 2026
 
-The official website for DEVOLUTION 2026 - GDG DAU's flagship tech event where coding meets chaos and creativity.
+The official website for DEVOLUTION 2026 - DSC DAU's (formerly GDG on Campus DAU) flagship tech event where coding meets chaos and creativity.
 
 ## About
 
-DEVOLUTION is GDG DAU's premier technology conference featuring workshops, hackathons, and talks from industry experts and community leaders. This website showcases the event with modern animations and an immersive user experience.
+DEVOLUTION is DSC DAU's (formerly GDG on Campus DAU) premier technology conference featuring workshops, hackathons, and talks from industry experts and community leaders. This website showcases the event with modern animations and an immersive user experience.
 
 ## Tech Stack
 
@@ -59,7 +59,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 
 ## Credits
 
-Built by GDG DAU Team
+Built by DSC DAU Team
 -Aditya Vaish & Neel Khatri
 
 ## License

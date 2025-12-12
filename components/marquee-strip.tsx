@@ -17,7 +17,7 @@ export function MarqueeStrip() {
     "CLOUD NATIVE",
     "OPEN SOURCE",
     "DEVOLUTION 2026",
-    "GDG DAU",
+    "DSC DAU",
     "HACKATHON",
     "WORKSHOPS",
   ]

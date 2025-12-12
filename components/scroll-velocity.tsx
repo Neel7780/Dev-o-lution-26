@@ -266,7 +266,7 @@ export function VelocityScrollSection() {
           ref={line2Ref}
           className="font-(--font-display) text-6xl md:text-8xl lg:text-9xl text-white/5 uppercase whitespace-nowrap"
         >
-          GDG DAU • GDG DAU • GDG DAU • GDG DAU • GDG DAU •
+          DSC DAU • DSC DAU • DSC DAU • DSC DAU • DSC DAU •
         </div>
 
         <div

@@ -168,123 +168,123 @@ export function MorphingBackground() {
 }
 
 // Floating particles component - optimized
-export function FloatingParticles() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const tweensRef = useRef<gsap.core.Tween[]>([])
-  const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
+// export function FloatingParticles() {
+//   const containerRef = useRef<HTMLDivElement>(null)
+//   const tweensRef = useRef<gsap.core.Tween[]>([])
+//   const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
 
-  useEffect(() => {
-    if (!containerRef.current) return
+//   useEffect(() => {
+//     if (!containerRef.current) return
     
-    const { isMobile, isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
+//     const { isMobile, isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
     
-    // Disable on reduced motion
-    if (prefersReducedMotion) return
+//     // Disable on reduced motion
+//     if (prefersReducedMotion) return
 
-    const particles = containerRef.current.querySelectorAll(".particle")
+//     const particles = containerRef.current.querySelectorAll(".particle")
     
-    const ctx = gsap.context(() => {
-      particles.forEach((particle, index) => {
-        // Random starting position
-        gsap.set(particle, {
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight,
-        })
+//     const ctx = gsap.context(() => {
+//       particles.forEach((particle, index) => {
+//         // Random starting position
+//         gsap.set(particle, {
+//           x: Math.random() * window.innerWidth,
+//           y: Math.random() * window.innerHeight,
+//         })
 
-        // Floating animation - cache tweens (simplified on mobile)
-        const duration = isMobile ? 8 + Math.random() * 4 : 5 + Math.random() * 5
-        const distance = isMobile ? 50 + Math.random() * 100 : 100 + Math.random() * 200
+//         // Floating animation - cache tweens (simplified on mobile)
+//         const duration = isMobile ? 8 + Math.random() * 4 : 5 + Math.random() * 5
+//         const distance = isMobile ? 50 + Math.random() * 100 : 100 + Math.random() * 200
         
-        const tween1 = gsap.to(particle, {
-          y: `-=${distance}`,
-          x: `+=${(Math.random() - 0.5) * (isMobile ? 50 : 100)}`,
-          opacity: 0,
-          duration,
-          repeat: -1,
-          delay: index * 0.5,
-          ease: "none",
-          onRepeat: function() {
-            gsap.set(particle, {
-              y: window.innerHeight + 50,
-              x: Math.random() * window.innerWidth,
-              opacity: 1,
-            })
-          },
-        })
+//         const tween1 = gsap.to(particle, {
+//           y: `-=${distance}`,
+//           x: `+=${(Math.random() - 0.5) * (isMobile ? 50 : 100)}`,
+//           opacity: 0,
+//           duration,
+//           repeat: -1,
+//           delay: index * 0.5,
+//           ease: "none",
+//           onRepeat: function() {
+//             gsap.set(particle, {
+//               y: window.innerHeight + 50,
+//               x: Math.random() * window.innerWidth,
+//               opacity: 1,
+//             })
+//           },
+//         })
 
-        // Subtle rotation
-        const tween2 = gsap.to(particle, {
-          rotation: 360,
-          duration: 10 + Math.random() * 10,
-          repeat: -1,
-          ease: "none",
-        })
+//         // Subtle rotation
+//         const tween2 = gsap.to(particle, {
+//           rotation: 360,
+//           duration: 10 + Math.random() * 10,
+//           repeat: -1,
+//           ease: "none",
+//         })
 
-        tweensRef.current.push(tween1, tween2)
-      })
+//         tweensRef.current.push(tween1, tween2)
+//       })
 
-      // Scroll-linked movement - use throttling
-      let lastUpdate = 0
-      scrollTriggerRef.current = ScrollTrigger.create({
-        trigger: document.body,
-        start: "top top",
-        end: "bottom bottom",
-        onUpdate: (self) => {
-          const now = Date.now()
-          if (now - lastUpdate < 50) return // Throttle to 20fps for particles
-          lastUpdate = now
+//       // Scroll-linked movement - use throttling
+//       let lastUpdate = 0
+//       scrollTriggerRef.current = ScrollTrigger.create({
+//         trigger: document.body,
+//         start: "top top",
+//         end: "bottom bottom",
+//         onUpdate: (self) => {
+//           const now = Date.now()
+//           if (now - lastUpdate < 50) return // Throttle to 20fps for particles
+//           lastUpdate = now
 
-          const velocity = self.getVelocity() / 1000
-          particles.forEach((particle) => {
-            gsap.to(particle, {
-              y: `-=${velocity * 2}`,
-              duration: 0.5,
-              ease: "power2.out",
-              overwrite: false,
-            })
-          })
-        },
-      })
-    }, containerRef)
+//           const velocity = self.getVelocity() / 1000
+//           particles.forEach((particle) => {
+//             gsap.to(particle, {
+//               y: `-=${velocity * 2}`,
+//               duration: 0.5,
+//               ease: "power2.out",
+//               overwrite: false,
+//             })
+//           })
+//         },
+//       })
+//     }, containerRef)
 
-    return () => {
-      ctx.revert()
-      tweensRef.current.forEach(tween => tween.kill())
-      tweensRef.current = []
-      scrollTriggerRef.current?.kill()
-      scrollTriggerRef.current = null
-    }
-  }, [])
+//     return () => {
+//       ctx.revert()
+//       tweensRef.current.forEach(tween => tween.kill())
+//       tweensRef.current = []
+//       scrollTriggerRef.current?.kill()
+//       scrollTriggerRef.current = null
+//     }
+//   }, [])
 
-  const { isMobile, isLowEndDevice } = getDeviceCapabilities()
+//   const { isMobile, isLowEndDevice } = getDeviceCapabilities()
   
-  // Reduce particles based on device
-  const particleCount = isLowEndDevice ? 5 : isMobile ? 8 : 15
+//   // Reduce particles based on device
+//   const particleCount = isLowEndDevice ? 5 : isMobile ? 8 : 15
   
-  return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 -z-5 pointer-events-none overflow-hidden"
-    >
-      {[...Array(particleCount)].map((_, i) => (
-        <div
-          key={i}
-          className="particle absolute w-1 h-1 rounded-full"
-          style={{
-            background: [
-              "rgba(250, 204, 21, 0.6)",
-              "rgba(34, 211, 238, 0.6)",
-              "rgba(168, 85, 247, 0.6)",
-              "rgba(236, 72, 153, 0.6)",
-            ][i % 4],
-            boxShadow: `0 0 ${4 + i % 3 * 2}px currentColor`,
-            willChange: "transform, opacity",
-          }}
-        />
-      ))}
-    </div>
-  )
-}
+//   return (
+//     <div
+//       ref={containerRef}
+//       className="fixed inset-0 -z-5 pointer-events-none overflow-hidden"
+//     >
+//       {[...Array(particleCount)].map((_, i) => (
+//         <div
+//           key={i}
+//           className="particle absolute w-1 h-1 rounded-full"
+//           style={{
+//             background: [
+//               "rgba(250, 204, 21, 0.6)",
+//               "rgba(34, 211, 238, 0.6)",
+//               "rgba(168, 85, 247, 0.6)",
+//               "rgba(236, 72, 153, 0.6)",
+//             ][i % 4],
+//             boxShadow: `0 0 ${4 + i % 3 * 2}px currentColor`,
+//             willChange: "transform, opacity",
+//           }}
+//         />
+//       ))}
+//     </div>
+//   )
+// }
 
 // Gradient mesh background - optimized
 export function GradientMesh() {
