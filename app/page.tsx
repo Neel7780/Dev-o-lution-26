@@ -16,6 +16,7 @@ import { VelocityScrollSection } from "@/components/scroll-velocity"
 import { DesktopOnlyBackgrounds } from "@/components/desktop-only-backgrounds"
 
 export default function Home() {
+  // Force refresh
   return (
     <main className="min-h-screen overflow-x-hidden relative">
       {/* Animated background elements - desktop only for performance */}

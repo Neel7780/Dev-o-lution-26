@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Sparkles, Zap, Star, Cloud, Code, Rocket } from "lucide-react"
@@ -17,7 +17,7 @@ export function HeroSection() {
   const badgeRef = useRef<HTMLDivElement>(null)
   const subtitleRef = useRef<HTMLDivElement>(null)
   const dateCardsRef = useRef<HTMLDivElement>(null)
-  const ctaRef = useRef<HTMLDivElement>(null)
+  const countdownRef = useRef<HTMLDivElement>(null)
   const logoContainerRef = useRef<HTMLDivElement>(null)
   const devoCharsRef = useRef<(HTMLSpanElement | null)[]>([])
   const lutionCharsRef = useRef<(HTMLSpanElement | null)[]>([])
@@ -178,25 +178,13 @@ export function HeroSection() {
         )
       }
 
-      // CTA button - dramatic entrance with pulse
+      // Countdown entrance
       masterTL.fromTo(
-        ctaRef.current,
-        { y: 30, opacity: 0, scale: 0.8 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: "back.out(2)" },
-        "-=0.3"
+        countdownRef.current,
+        { y: 30, opacity: 0, scale: 0.9 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "elastic.out(1, 0.6)" },
+        "-=0.2"
       )
-
-      // Add pulsing glow to CTA
-      const ctaLink = ctaRef.current?.querySelector("a")
-      if (ctaLink) {
-        masterTL.to(ctaLink, {
-          boxShadow: "0 0 20px rgba(250, 204, 21, 0.5), 0 0 40px rgba(250, 204, 21, 0.3)",
-          duration: 1,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        })
-      }
 
       // Floating stickers entrance with physics-like bounce (simplified on mobile)
       const stickers = sectionRef.current?.querySelectorAll(".floating-sticker")
@@ -421,7 +409,7 @@ export function HeroSection() {
         <div ref={dateCardsRef} className="flex flex-wrap justify-center gap-4 md:gap-6 mt-6">
           <StampSticker rotation="-rotate-3" color="bg-orange-400">
             <span className="font-bold text-xs md:text-sm uppercase text-black">Date:</span>
-            <span className="font-(--font-display) text-xl md:text-2xl lg:text-3xl text-black">TBA 2026</span>
+            <span className="font-(--font-display) text-xl md:text-2xl lg:text-3xl text-black">18th Jan 2026</span>
           </StampSticker>
 
           <StampSticker rotation="rotate-2" color="bg-cyan-400">
@@ -430,18 +418,12 @@ export function HeroSection() {
           </StampSticker>
         </div>
 
-        {/* CTA Button */}
-        <div ref={ctaRef} className="mt-10 md:mt-12">
-          <a
-            href="#waitlist"
-            data-magnetic="0.3"
-            className="inline-block bg-black text-white border-[3px] border-black px-8 md:px-10 py-3 md:py-4 font-bold text-lg md:text-xl uppercase tracking-wide brutal-shadow-lg hover:bg-yellow-400 hover:text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000] relative overflow-hidden group"
-          >
-            {/* Button shine effect */}
-            <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-500 bg-linear-to-r from-transparent via-white/20 to-transparent" />
-            <span className="relative">Get Notified →</span>
-          </a>
+        {/* Countdown Timer */}
+        <div ref={countdownRef} className="mt-10 md:mt-12">
+          <Countdown targetDate="2026-01-18T00:00:00" />
         </div>
+
+
       </div>
 
       {/* Decorative bottom line */}
@@ -480,6 +462,63 @@ function StampSticker({ children, rotation, color }: { children: React.ReactNode
       data-magnetic="0.2"
     >
       {children}
+    </div>
+  )
+}
+
+function Countdown({ targetDate }: { targetDate: string }) {
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft())
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  function calculateTimeLeft() {
+    const difference = +new Date(targetDate) - +new Date()
+    let timeLeft = {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    }
+
+    if (difference > 0) {
+      timeLeft = {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      }
+    }
+    return timeLeft
+  }
+
+  const timeUnits = [
+    { label: "Days", value: timeLeft.days },
+    { label: "Hours", value: timeLeft.hours },
+    { label: "Mins", value: timeLeft.minutes },
+    { label: "Secs", value: timeLeft.seconds },
+  ]
+
+  return (
+    <div className="flex flex-wrap justify-center gap-3 md:gap-6">
+      {timeUnits.map((unit, i) => (
+        <div key={unit.label} className="flex flex-col items-center">
+          <div className="bg-black text-white border-2 border-black w-16 h-16 md:w-20 md:h-20 flex items-center justify-center brutal-shadow relative overflow-hidden group">
+            <span className="font-(--font-display) text-2xl md:text-3xl relative z-10">
+              {unit.value.toString().padStart(2, "0")}
+            </span>
+            {/* Shine effect */}
+            <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+          </div>
+          <span className="font-bold text-xs md:text-sm uppercase mt-2 bg-yellow-400 px-2 border border-black shadow-[2px_2px_0px_0px_#000]">
+            {unit.label}
+          </span>
+        </div>
+      ))}
     </div>
   )
 }

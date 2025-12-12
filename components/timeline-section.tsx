@@ -3,7 +3,8 @@
 import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { Rocket, Users, Calendar, Trophy } from "lucide-react"
+import { Rocket, Users, Calendar } from "lucide-react"
+// Force rebuild
 import { getDeviceCapabilities } from "@/lib/mobile-optimization"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -11,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger)
 const timelineSteps = [
   {
     title: "Registration Kicks Off",
-    date: "TBA",
+    date: "13th December 2025",
     description: "Be the first to secure your spot",
     icon: Rocket,
     color: "bg-yellow-400",
@@ -32,14 +33,6 @@ const timelineSteps = [
     icon: Calendar,
     color: "bg-violet-500",
     textColor: "text-white",
-  },
-  {
-    title: "DEVOLUTION DAY 2",
-    date: "TBA",
-    description: "Hackathons & Closing Ceremony",
-    icon: Trophy,
-    color: "bg-lime-400",
-    textColor: "text-black",
   },
 ]
 

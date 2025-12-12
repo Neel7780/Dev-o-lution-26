@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { Users, Code, Calendar, Trophy, Coffee, GitBranch } from "lucide-react"
+import { Users, Code, Calendar, Coffee, GitBranch } from "lucide-react"
 import { getDeviceCapabilities } from "@/lib/mobile-optimization"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -31,7 +31,7 @@ const stats = [
     color: "bg-fuchsia-500",
   },
   {
-    icon: Trophy,
+    icon: Coffee,
     value: 50,
     suffix: "K+",
     label: "in Prizes",

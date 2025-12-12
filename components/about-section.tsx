@@ -5,11 +5,12 @@ import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { motion } from "framer-motion"
-import { ArrowDown, Code, Users, Lightbulb } from "lucide-react"
+import { Code, Users, Lightbulb } from "lucide-react"
 
 gsap.registerPlugin(ScrollTrigger)
 
 export function AboutSection() {
+  // Rebuild component
   const sectionRef = useRef<HTMLElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
@@ -235,8 +236,8 @@ export function AboutSection() {
               >
                 workshops
               </span>
-              ,
-              <span
+              
+              {/* <span
                 className="highlight-text bg-fuchsia-500 text-white px-2 font-bold ml-1"
                 style={{
                   backgroundImage: "linear-gradient(to right, rgb(217 70 239) 0%, rgb(217 70 239) 100%)",
@@ -245,8 +246,8 @@ export function AboutSection() {
                 }}
               >
                 hackathons
-              </span>
-              , and
+              </span> */}
+              and
               <span
                 className="highlight-text bg-lime-400 px-2 font-bold ml-1"
                 style={{
@@ -272,7 +273,21 @@ export function AboutSection() {
             transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5 }}
             className="absolute -bottom-16 right-8 text-black"
           >
-            <ArrowDown size={48} strokeWidth={3} />
+            {/* <ArrowDown size={48} strokeWidth={3} /> */}
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="48" 
+              height="48" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="3" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <path d="M12 5v14" />
+              <path d="m19 12-7 7-7-7" />
+            </svg>
           </motion.div>
         </div>
       </div>

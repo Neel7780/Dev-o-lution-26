@@ -44,7 +44,7 @@ export function Navbar() {
         <a href="#" className="flex items-center gap-2 group">
           <GDGLogoSimple size={36} className="transition-transform duration-300 group-hover:scale-110" />
           <div className="bg-yellow-400 border-[3px] border-black px-3 py-1 brutal-shadow transition-transform duration-300 group-hover:-rotate-2 group-hover:scale-105">
-            <span className="font-(--font-display) text-lg md:text-xl font-black tracking-tight text-black">
+            <span className="font-(--font-display) text-lg md:text-xl tracking-tight text-black">
               DSC DAU
             </span>
           </div>
@@ -62,10 +62,10 @@ export function Navbar() {
             </a>
           ))}
           <a
-            href="#waitlist"
+            href="https://unstop.com/p/dev-o-lution-2026-google-developer-group-on-campus-daiict-1609021"
             className="ml-2 bg-fuchsia-500 text-white border-[3px] border-black px-4 py-2 font-bold text-sm uppercase tracking-wide brutal-shadow hover:bg-fuchsia-600 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#000] transition-all duration-300"
           >
-            Join Waitlist
+            Register Now
           </a>
         </div>
 
@@ -94,11 +94,11 @@ export function Navbar() {
             </a>
           ))}
           <a
-            href="#waitlist"
+            href="https://unstop.com/p/dev-o-lution-2026-google-developer-group-on-campus-daiict-1609021"
             onClick={() => setIsOpen(false)}
             className="block mt-4 bg-fuchsia-500 text-white text-center border-[3px] border-black px-4 py-3 font-bold uppercase tracking-wide brutal-shadow"
           >
-            Join Waitlist
+            Register Now
           </a>
         </div>
       )}

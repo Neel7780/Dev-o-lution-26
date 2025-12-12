@@ -18,127 +18,86 @@ export function MarqueeStrip() {
     "OPEN SOURCE",
     "DEVOLUTION 2026",
     "DSC DAU",
-    "HACKATHON",
     "WORKSHOPS",
   ]
 
+  // Duplicate items enough times to cover large screens
+  // We create a "set" of items that is definitely wider than the screen
+  const REPEAT_IN_SET = 5
+  const singleSet = Array(REPEAT_IN_SET).fill(items).flat()
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Base marquee animation
-      const marqueeAnimation1 = gsap.to(track1Ref.current, {
-        xPercent: -50,
-        ease: "none",
-        duration: 25,
-        repeat: -1,
-      })
+      const el1 = track1Ref.current
+      const el2 = track2Ref.current
 
-      const marqueeAnimation2 = gsap.to(track2Ref.current, {
-        xPercent: 50,
-        ease: "none",
-        duration: 30,
-        repeat: -1,
-      })
+      if (!el1 || !el2) return
 
-      // Scroll-triggered speed boost
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: "top bottom",
-        end: "bottom top",
-        onUpdate: (self) => {
-          const velocity = Math.abs(self.getVelocity()) / 1000
-          const speedMultiplier = 1 + Math.min(velocity, 3)
-          
-          marqueeAnimation1.timeScale(speedMultiplier)
-          marqueeAnimation2.timeScale(speedMultiplier)
-          
-          // Reset speed smoothly
-          gsap.to(marqueeAnimation1, {
-            timeScale: 1,
-            duration: 0.5,
-            delay: 0.1,
-            overwrite: true,
-          })
-          gsap.to(marqueeAnimation2, {
-            timeScale: 1,
-            duration: 0.5,
-            delay: 0.1,
-            overwrite: true,
-          })
-        },
-      })
+      // We have two identical sets in each track.
+      // Total width = 2 * WidthOfSet
+      // We want to move by WidthOfSet, which is 50% of the total width.
+      
+      // Calculate duration based on width to maintain consistent speed
+      const totalWidth = el1.offsetWidth
+      const distance = totalWidth / 2 // We move by half the width
+      const speed = 100 // px per second
+      const duration = distance / speed
 
-      // Scale effect on scroll
-      gsap.fromTo(
-        containerRef.current,
-        {
-          scaleX: 0.98,
-        },
-        {
-          scaleX: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
+      // Track 1: Moves Left (0 -> -50%)
+      gsap.fromTo(el1, 
+        { xPercent: 0 },
+        { 
+          xPercent: -50, 
+          duration: duration, 
+          ease: "none", 
+          repeat: -1 
         }
       )
 
-      // Skew effect based on scroll direction
-      ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: "top bottom",
-        end: "bottom top",
-        onUpdate: (self) => {
-          const skew = self.direction * Math.min(Math.abs(self.getVelocity()) / 500, 3)
-          gsap.to(containerRef.current, {
-            skewX: skew,
-            duration: 0.3,
-            ease: "power2.out",
-          })
-        },
-        onLeave: () => {
-          gsap.to(containerRef.current, {
-            skewX: 0,
-            duration: 0.5,
-          })
-        },
-        onLeaveBack: () => {
-          gsap.to(containerRef.current, {
-            skewX: 0,
-            duration: 0.5,
-          })
-        },
-      })
+      // Track 2: Moves Right (-50% -> 0)
+      gsap.fromTo(el2,
+        { xPercent: -50 },
+        { 
+          xPercent: 0, 
+          duration: duration, 
+          ease: "none", 
+          repeat: -1 
+        }
+      )
 
     }, containerRef)
-
     return () => ctx.revert()
   }, [])
 
   return (
-    <div className="bg-yellow-400 border-y-4 border-black py-4 overflow-hidden">
-      <div className="animate-marquee flex whitespace-nowrap">
-        {[...items, ...items, ...items, ...items].map((item, i) => (
+    <div ref={containerRef} className="bg-[#FFD700] border-y-4 border-black py-8 overflow-hidden relative z-10">
+      {/* Track 1 - moves left */}
+      <div ref={track1Ref} className="flex whitespace-nowrap w-fit">
+        {/* Render two sets of items */}
+        {[...singleSet, ...singleSet].map((item, i) => (
           <span
-            key={i}
-            className="font-(--font-display) text-2xl md:text-3xl uppercase mx-6 flex items-center gap-4 text-black"
+            key={`t1-${i}`}
+            className="font-[var(--font-display)] text-4xl md:text-6xl font-black uppercase mx-8 flex items-center gap-8 text-black"
           >
-            <span className="text-black/40">///</span>
+            <span className="text-black/30">///</span>
             <span>{item}</span>
           </span>
         ))}
       </div>
-      
-      {/* Second track - moves right (opposite direction) */}
-      <div ref={track2Ref} className="flex whitespace-nowrap -translate-x-1/2">
-        {[...items, ...items, ...items, ...items].map((item, i) => (
+
+      {/* Track 2 - moves right */}
+      <div ref={track2Ref} className="flex whitespace-nowrap w-fit mt-4">
+        {/* Render two sets of items */}
+        {[...singleSet, ...singleSet].map((item, i) => (
           <span
-            key={`track2-${i}`}
-            className="font-[var(--font-display)] text-xl md:text-2xl font-black uppercase mx-6 flex items-center gap-4 text-black/60"
+            key={`t2-${i}`}
+            className="font-[var(--font-display)] text-4xl md:text-6xl font-black uppercase mx-8 flex items-center gap-8 text-black stroke-text"
+            style={{
+              WebkitTextStroke: "1px black",
+              color: "transparent"
+            }}
           >
-            <span className="text-black/30">◆</span>
+            <span className="text-black/30">///</span>
             <span>{item}</span>
           </span>
         ))}
