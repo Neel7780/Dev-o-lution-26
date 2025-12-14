@@ -63,4 +63,4 @@ Built by DSC DAU Team
 
 ## License
 
-This project is under MIT License.
+This project is under MIT License. GitHub sucks
