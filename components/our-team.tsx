@@ -21,22 +21,25 @@ const teamData = {
   "Speaker Team": [
     "Nisarg Trivedi",
     "Neel Khatri",
+    "Aditya Vaish",
     "Kalp Chaniyara",
     "Hrithik Patel",
     "Dhruvam Panchal",
-    "Aditya Vaish"
   ],
   "Sponsorship Team": [
     "Pushkar Patel",
-    "Jeel Aghera",
     "Khushi Gandhi",
-    "Param Savjani"
+    "Param Savjani",
+    "Ashka Pathak",
+    "Parth Maharaja"
   ],
   "PR Team": [
+    "Shrey Patel",
     "Anushree Katuri",
-    "Ashka Pathak",
+    "Prakriti Pandey",
     "Sakina Kheraj",
-    "Sumit Goyal"
+    "Jeel Aghera",
+    "Sumit Goyal",
   ]
 }
 
