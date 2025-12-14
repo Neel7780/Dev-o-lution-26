@@ -98,17 +98,13 @@ export function Footer() {
               <p className="text-white/80 text-lg">by DSC DAU (formerly GDG on Campus DAU)</p>
             </div>
 
-            <p className="text-white/60 text-lg flex items-center gap-2">
-              Built with <span className="text-xl">💻</span> and <span className="text-xl">☕</span>
-            </p>
-            
             <a
               href="https://devolution25.dscdaiict.in"
               target="_blank"
               rel="noreferrer"
               className="text-white/70 mb-8 text-sm uppercase tracking-wide hover:text-yellow-400 transition-colors"
             >
-              Devolution 2025
+              Devolution 2025 (Previous Year)
             </a>
 
             {/* Social Links */}
@@ -117,6 +113,8 @@ export function Footer() {
                 <a
                   key={social.label}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="bg-white text-black border-[3px] border-white p-3 brutal-shadow hover:bg-yellow-400 hover:-translate-y-1 transition-all duration-300"
                   aria-label={social.label}
                   data-magnetic="0.3"
