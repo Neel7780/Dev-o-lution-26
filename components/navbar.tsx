@@ -10,6 +10,7 @@ const navLinks = [
   { label: "Tracks", href: "#tracks" },
   { label: "Timeline", href: "#timeline" },
   { label: "Speakers", href: "#speakers" },
+  { label: "2025", href: "/last-chapter" },
   { label: "Contact", href: "#contact" },
 ]
 
@@ -63,6 +64,8 @@ export function Navbar() {
           ))}
           <a
             href="https://unstop.com/p/dev-o-lution-2026-google-developer-group-on-campus-daiict-1609021"
+            target="_blank"
+            rel="noopener noreferrer"
             className="ml-2 bg-fuchsia-500 text-white border-[3px] border-black px-4 py-2 font-bold text-sm uppercase tracking-wide brutal-shadow hover:bg-fuchsia-600 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#000] transition-all duration-300"
           >
             Register Now
@@ -95,6 +98,8 @@ export function Navbar() {
           ))}
           <a
             href="https://unstop.com/p/dev-o-lution-2026-google-developer-group-on-campus-daiict-1609021"
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() => setIsOpen(false)}
             className="block mt-4 bg-fuchsia-500 text-white text-center border-[3px] border-black px-4 py-3 font-bold uppercase tracking-wide brutal-shadow"
           >
