@@ -342,7 +342,7 @@ export default function SpeakersPage() {
               Submission Deadline
             </h2>
             <p className="font-(--font-display) text-2xl md:text-3xl uppercase text-white">
-              December 31, 2024
+              December 31, 2025
             </p>
           </div>
         </div>

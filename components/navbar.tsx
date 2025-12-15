@@ -10,6 +10,7 @@ const navLinks = [
   { label: "Tracks", href: "/#tracks" },
   { label: "Timeline", href: "/#timeline" },
   { label: "Speakers", href: "/#speakers" },
+  { label: "Speaker Manual", href: "/speaker-manual" },
   { label: "2025", href: "/previous-chapter" },
   { label: "Contact", href: "/#contact" },
 ]
