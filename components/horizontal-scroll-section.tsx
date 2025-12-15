@@ -85,12 +85,14 @@ export function HorizontalScrollSection() {
   }, [])
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    if (!mounted || !sectionRef.current) return
 
     const { isLowEndDevice, prefersReducedMotion } = getDeviceCapabilities()
 
-    const ctx = gsap.context(() => {
-      if (isMobile) {
+    // Small delay to ensure DOM is fully rendered and sizes are calculated
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        if (isMobile) {
         // MOBILE: Vertical scroll with staggered card animations
 
         // Heading animation
@@ -235,13 +237,25 @@ export function HorizontalScrollSection() {
       }
     }, sectionRef)
 
-    return () => ctx.revert()
-  }, [isMobile])
+    // Force ScrollTrigger to refresh after all animations are set up
+    ScrollTrigger.refresh()
 
-  // Prevent hydration mismatch - always render desktop layout on server
-  // Client will switch to mobile layout after mount if needed
+    return () => ctx.revert()
+    }, 100) // Small delay for layout calculation
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [isMobile, mounted])
+
+  // Prevent hydration mismatch - render loading state on server
+  // Client will switch layout after mount
   if (!mounted) {
-    return null
+    return (
+      <section className="relative bg-black min-h-screen flex items-center justify-center">
+        <div className="text-white text-2xl">Loading...</div>
+      </section>
+    )
   }
 
   // Mobile Layout - Vertical scrolling cards
