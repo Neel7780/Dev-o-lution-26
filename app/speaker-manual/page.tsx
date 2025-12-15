@@ -89,14 +89,6 @@ const benefits = [
   },
 ]
 
-const perks = [
-  "VIP access to all conference sessions and exclusive speaker lounge",
-  "Direct engagement with 500+ developers, technologists, and industry professionals",
-  "Featured promotion across GDG on Campus DA-IICT's social media and marketing channels",
-  "Professional photography and videography of your session",
-  "Certificate of appreciation and speaker recognition",
-]
-
 export default function SpeakersPage() {
   const heroRef = useRef<HTMLElement>(null)
   const sectionsRef = useRef<(HTMLElement | null)[]>([])
@@ -338,30 +330,6 @@ export default function SpeakersPage() {
         </div>
       </section>
 
-      {/* Perks */}
-      <section 
-        ref={(el) => { sectionsRef.current[5] = el }}
-        className="py-12 md:py-20 px-4"
-      >
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white border-[3px] border-black brutal-shadow-lg p-8 md:p-12">
-            <h2 className="font-(--font-display) text-3xl md:text-4xl uppercase mb-6 inline-block">
-              <span className="bg-fuchsia-500 text-white px-3 py-1 border-[3px] border-black brutal-shadow rotate-1">
-                What You&apos;ll Receive
-              </span>
-            </h2>
-            <div className="space-y-4">
-              {perks.map((perk, index) => (
-                <div key={index} className="bg-yellow-400 border-2 border-black p-4 flex items-start gap-3">
-                  <Star className="w-6 h-6 text-black shrink-0 mt-0.5" />
-                  <span className="font-bold text-black">{perk}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Key Dates */}
       <section 
         ref={(el) => { sectionsRef.current[6] = el }}
@@ -386,7 +354,7 @@ export default function SpeakersPage() {
         className="py-12 md:py-32 px-4"
       >
         <div className="max-w-5xl mx-auto">
-          <div className="bg-linear-to-r from-cyan-400 via-yellow-400 to-violet-500 border-[3px] border-black brutal-shadow-lg p-12 md:p-16 text-center">
+          <div className="bg-cyan-400 border-[3px] border-black brutal-shadow-lg p-12 md:p-16 text-center">
             <h2 className="font-(--font-display) text-3xl md:text-5xl uppercase mb-6 text-black">
               Ready to Inspire?
             </h2>
