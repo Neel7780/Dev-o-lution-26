@@ -4,10 +4,30 @@ import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { HelpCircle, Lock, Eye, EyeOff } from "lucide-react"
+import Image from "next/image"
 
 gsap.registerPlugin(ScrollTrigger)
 
-const speakers = [1, 2, 3, 4]
+type Speaker = {
+  name: string
+  photo: string
+  position: string
+  talkTitle?: string
+  isRevealed: boolean
+}
+
+const speakers: (Speaker | null)[] = [
+  {
+    name: "Abhishek Doshi",
+    photo: "/current-chapter/speaker-images/abhishek_doshi.png",
+    position: "Google Developer Expert (GDE) for Dart, Flutter & Firebase",
+    talkTitle: "The Dynamic Duo: Introduction to Modern App Development with Flutter & Firebase",
+    isRevealed: true,
+  },
+  null, // Placeholder for speaker 2
+  null, // Placeholder for speaker 3
+  null, // Placeholder for speaker 4
+]
 
 // Glitch text characters for mystery effect
 const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`"
@@ -281,59 +301,100 @@ export function SpeakersSection() {
 
         {/* Speaker Cards Grid */}
         <div ref={cardsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {speakers.map((_, index) => (
-            <div
-              key={index}
-              className="speaker-card bg-white border-[3px] border-black p-3 brutal-shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#000] group relative overflow-hidden"
-              style={{
-                transform: `rotate(${(index - 1.5) * 1.5}deg)`,
-              }}
-              data-magnetic="0.1"
-            >
-              {/* Hover glitch effect overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-fuchsia-500/0 to-yellow-500/0 group-hover:from-cyan-500/10 group-hover:via-fuchsia-500/10 group-hover:to-yellow-500/10 transition-all duration-300" />
+          {speakers.map((speaker, index) => {
+            const isRevealed = speaker?.isRevealed ?? false
+            
+            return (
+              <div
+                key={index}
+                className="speaker-card bg-white border-[3px] border-black p-3 brutal-shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#000] group relative overflow-hidden"
+                style={{
+                  transform: `rotate(${(index - 1.5) * 1.5}deg)`,
+                }}
+                data-magnetic="0.1"
+              >
+                {/* Hover glitch effect overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-fuchsia-500/0 to-yellow-500/0 group-hover:from-cyan-500/10 group-hover:via-fuchsia-500/10 group-hover:to-yellow-500/10 transition-all duration-300" />
 
-              <div className="aspect-square bg-gradient-to-br from-black/5 to-black/10 border-2 border-black flex flex-col items-center justify-center mb-3 relative overflow-hidden">
-                {/* Animated scan line */}
-                <div
-                  className="absolute w-full h-1 bg-white/20 top-0 left-0"
-                  style={{
-                    animation: "scan 2s ease-in-out infinite",
-                    animationDelay: `${index * 0.5}s`,
-                  }}
-                />
+                <div className="aspect-square bg-gradient-to-br from-black/5 to-black/10 border-2 border-black flex flex-col items-center justify-center mb-3 relative overflow-hidden">
+                  {/* Animated scan line */}
+                  <div
+                    className="absolute w-full h-1 bg-white/20 top-0 left-0 z-10"
+                    style={{
+                      animation: "scan 2s ease-in-out infinite",
+                      animationDelay: `${index * 0.5}s`,
+                    }}
+                  />
 
-                {/* Mystery icon with glitch */}
-                <div className="relative">
-                  <HelpCircle className="w-12 h-12 md:w-16 lg:w-20 md:h-16 lg:h-20 text-black/30 mb-2 group-hover:text-violet-500/50 transition-colors" />
-                  <Eye className="absolute inset-0 w-12 h-12 md:w-16 lg:w-20 md:h-16 lg:h-20 text-transparent group-hover:text-black/10 transition-all duration-300 opacity-0 group-hover:opacity-100" />
+                  {isRevealed && speaker ? (
+                    <>
+                      {/* Revealed speaker image */}
+                      <Image
+                        src={speaker.photo}
+                        alt={speaker.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                      />
+                      {/* GDE Badge overlay */}
+                      <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 border-2 border-black brutal-shadow text-xs font-black uppercase z-20">
+                        GDE
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Mystery icon with glitch */}
+                      <div className="relative">
+                        <HelpCircle className="w-12 h-12 md:w-16 lg:w-20 md:h-16 lg:h-20 text-black/30 mb-2 group-hover:text-violet-500/50 transition-colors" />
+                        <Eye className="absolute inset-0 w-12 h-12 md:w-16 lg:w-20 md:h-16 lg:h-20 text-transparent group-hover:text-black/10 transition-all duration-300 opacity-0 group-hover:opacity-100" />
+                      </div>
+
+                      <span
+                        ref={(el) => { glitchTextRefs.current[index] = el }}
+                        className="font-bold text-black/40 text-sm uppercase font-mono tracking-wider"
+                      >
+                        ???
+                      </span>
+
+                      {/* Corner decorations */}
+                      <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-black/20" />
+                      <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-black/20" />
+                      <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-black/20" />
+                      <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-black/20" />
+                    </>
+                  )}
                 </div>
 
-                <span
-                  ref={(el) => { glitchTextRefs.current[index] = el }}
-                  className="font-bold text-black/40 text-sm uppercase font-mono tracking-wider"
-                >
-                  ???
-                </span>
-
-                {/* Corner decorations */}
-                <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-black/20" />
-                <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-black/20" />
-                <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-black/20" />
-                <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-black/20" />
+                <div className="text-center py-2 relative">
+                  {isRevealed && speaker ? (
+                    <>
+                      <p className="font-(--font-display) text-sm md:text-base font-black uppercase text-black group-hover:text-cyan-600 transition-colors mb-1">
+                        {speaker.name}
+                      </p>
+                      <p className="text-xs md:text-sm font-bold text-black/70 mb-1 leading-tight">
+                        {speaker.position}
+                      </p>
+                      {speaker.talkTitle && (
+                        <p className="text-[10px] md:text-xs font-semibold text-violet-600 mt-1 line-clamp-2 italic">
+                          "{speaker.talkTitle}"
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-(--font-display) text-sm md:text-base font-black uppercase text-black/60 group-hover:text-black transition-colors">
+                        Speaker {index + 1}
+                      </p>
+                      <p className="text-xs md:text-sm font-bold uppercase text-violet-600 flex items-center justify-center gap-1">
+                        <span className="inline-block w-2 h-2 bg-violet-600 rounded-full animate-pulse" />
+                        Coming Soon
+                      </p>
+                    </>
+                  )}
+                </div>
               </div>
-
-              <div className="text-center py-2 relative">
-                <p className="font-(--font-display) text-sm md:text-base font-black uppercase text-black/60 group-hover:text-black transition-colors">
-                  Speaker {index + 1}
-                </p>
-                <p className="text-xs md:text-sm font-bold uppercase text-violet-600 flex items-center justify-center gap-1">
-                  <span className="inline-block w-2 h-2 bg-violet-600 rounded-full animate-pulse" />
-                  Coming Soon
-                </p>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* Bottom Text */}
@@ -341,7 +402,10 @@ export function SpeakersSection() {
           ref={textRef}
           className="text-center mt-10 md:mt-12 text-base md:text-lg lg:text-xl font-bold text-black/60"
         >
-          🎤 Industry experts & community legends incoming... Stay tuned!
+          {speakers.filter(s => s?.isRevealed).length > 0 
+            ? "🎤 More industry experts & community legends incoming... Stay tuned!"
+            : "🎤 Industry experts & community legends incoming... Stay tuned!"
+          }
         </p>
       </div>
 
