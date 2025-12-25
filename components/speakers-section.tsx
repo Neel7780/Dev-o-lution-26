@@ -13,6 +13,7 @@ type Speaker = {
   photo: string
   position: string
   talkTitle?: string
+  intro?: string
   isRevealed: boolean
 }
 
@@ -22,6 +23,7 @@ const speakers: (Speaker | null)[] = [
     photo: "/current-chapter/speaker-images/abhishek_doshi.png",
     position: "Google Developer Expert (GDE) for Dart, Flutter & Firebase",
     talkTitle: "The Dynamic Duo: Introduction to Modern App Development with Flutter & Firebase",
+    intro: "Abhishek Doshi is a Google Developer Expert for Dart, Flutter & Firebase with over 7+ years of experience in app development, currently working as Tech Lead at a US-based health-tech company as well as Founder of Zeth Technologies",
     isRevealed: true,
   },
   null, // Placeholder for speaker 2
@@ -313,10 +315,12 @@ export function SpeakersSection() {
                 }}
                 data-magnetic="0.1"
               >
-                {/* Hover glitch effect overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-fuchsia-500/0 to-yellow-500/0 group-hover:from-cyan-500/10 group-hover:via-fuchsia-500/10 group-hover:to-yellow-500/10 transition-all duration-300" />
+                {/* Content wrapper that gets blurred on hover */}
+                <div className={`relative transition-all duration-300 ${isRevealed && speaker?.intro ? 'group-hover:blur-[4px]' : ''}`}>
+                  {/* Hover glitch effect overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-fuchsia-500/0 to-yellow-500/0 group-hover:from-cyan-500/10 group-hover:via-fuchsia-500/10 group-hover:to-yellow-500/10 transition-all duration-300 z-10" />
 
-                <div className="aspect-square bg-gradient-to-br from-black/5 to-black/10 border-2 border-black flex flex-col items-center justify-center mb-3 relative overflow-hidden">
+                  <div className="aspect-square bg-gradient-to-br from-black/5 to-black/10 border-2 border-black flex flex-col items-center justify-center mb-3 relative overflow-hidden">
                   {/* Animated scan line */}
                   <div
                     className="absolute w-full h-1 bg-white/20 top-0 left-0 z-10"
@@ -363,35 +367,47 @@ export function SpeakersSection() {
                       <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-black/20" />
                     </>
                   )}
+                  </div>
+
+                  <div className="text-center py-2 relative">
+                    {isRevealed && speaker ? (
+                      <>
+                        <p className="font-(--font-display) text-sm md:text-base font-black uppercase text-black group-hover:text-cyan-600 transition-colors mb-1">
+                          {speaker.name}
+                        </p>
+                        <p className="text-xs md:text-sm font-bold text-black/70 mb-1 leading-tight">
+                          {speaker.position}
+                        </p>
+                        {speaker.talkTitle && (
+                          <p className="text-[10px] md:text-xs font-semibold text-violet-600 mt-1 line-clamp-2 italic">
+                            "{speaker.talkTitle}"
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-(--font-display) text-sm md:text-base font-black uppercase text-black/60 group-hover:text-black transition-colors">
+                          Speaker {index + 1}
+                        </p>
+                        <p className="text-xs md:text-sm font-bold uppercase text-violet-600 flex items-center justify-center gap-1">
+                          <span className="inline-block w-2 h-2 bg-violet-600 rounded-full animate-pulse" />
+                          Coming Soon
+                        </p>
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                <div className="text-center py-2 relative">
-                  {isRevealed && speaker ? (
-                    <>
-                      <p className="font-(--font-display) text-sm md:text-base font-black uppercase text-black group-hover:text-cyan-600 transition-colors mb-1">
-                        {speaker.name}
+                {/* Intro overlay - shows on hover for revealed speakers */}
+                {isRevealed && speaker?.intro && (
+                  <div className="absolute inset-0 bg-white z-50 p-4 md:p-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
+                    <div className="border-[3px] border-black p-4 md:p-5 w-full h-full flex items-center justify-center">
+                      <p className="text-xs md:text-sm font-semibold text-black leading-relaxed text-center">
+                        {speaker.intro}
                       </p>
-                      <p className="text-xs md:text-sm font-bold text-black/70 mb-1 leading-tight">
-                        {speaker.position}
-                      </p>
-                      {speaker.talkTitle && (
-                        <p className="text-[10px] md:text-xs font-semibold text-violet-600 mt-1 line-clamp-2 italic">
-                          "{speaker.talkTitle}"
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <p className="font-(--font-display) text-sm md:text-base font-black uppercase text-black/60 group-hover:text-black transition-colors">
-                        Speaker {index + 1}
-                      </p>
-                      <p className="text-xs md:text-sm font-bold uppercase text-violet-600 flex items-center justify-center gap-1">
-                        <span className="inline-block w-2 h-2 bg-violet-600 rounded-full animate-pulse" />
-                        Coming Soon
-                      </p>
-                    </>
-                  )}
-                </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}
