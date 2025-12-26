@@ -26,9 +26,16 @@ const speakers: (Speaker | null)[] = [
     intro: "Abhishek Doshi is a Google Developer Expert for Dart, Flutter & Firebase with over 7+ years of experience in app development, currently working as Tech Lead at a US-based health-tech company as well as Founder of Zeth Technologies",
     isRevealed: true,
   },
+  {
+    name: "Vaibhav Malpani",
+    photo: "/current-chapter/speaker-images/Vaibhav_malpani.jpg",
+    position: "Google Developer Expert (GDE) in CLoud",
+    talkTitle: "Intro to AI agents and ADK",
+    intro: "Vaibhav is Technical Lead with 9+ years of expertise working with Cloud Technologies. He is also a Google developer expert in GCP. He like to write blogs on medium and share his knowledge in such events.",
+    isRevealed: true,
+  },
   null, // Placeholder for speaker 2
   null, // Placeholder for speaker 3
-  null, // Placeholder for speaker 4
 ]
 
 // Glitch text characters for mystery effect
