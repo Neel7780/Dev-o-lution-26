@@ -36,13 +36,13 @@ const speakers: (Speaker | null)[] = [
   },
   {
     name: "Jaskaran Singh",
-    photo: "/current-chapter/speaker-images/jaskarn_singh.jpeg",
+    photo: "/current-chapter/speaker-images/Jaskarn_Singh.jpeg",
     position: "Expert in CP/DSA as well as SWE Google",
     talkTitle: "How to Master CP/DSA and ICPC",
     intro: "Jaskaran Singh is an ICPC World Finalist 2023 and also currently working as Software Engineer at Google. He have a keen interest in competitive programming and have gained immense experience over the years. Also he is a cofounder of Ask Senior, a platform to guide college students for competitive programming.",
     isRevealed: true,
   },
-  null, // Placeholder for speaker 3
+  null, // Placeholder for speaker 4
 ]
 
 // Glitch text characters for mystery effect
