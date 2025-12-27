@@ -34,7 +34,14 @@ const speakers: (Speaker | null)[] = [
     intro: "Vaibhav is Technical Lead with 9+ years of expertise working with Cloud Technologies. He is also a Google developer expert in GCP. He like to write blogs on medium and share his knowledge in such events.",
     isRevealed: true,
   },
-  null, // Placeholder for speaker 2
+  {
+    name: "Jaskaran Singh",
+    photo: "/current-chapter/speaker-images/jaskarn_singh.jpeg",
+    position: "Expert in CP/DSA as well as SWE Google",
+    talkTitle: "How to Master CP/DSA and ICPC",
+    intro: "Jaskaran Singh is an ICPC World Finalist 2023 and also currently working as Software Engineer at Google. He have a keen interest in competitive programming and have gained immense experience over the years. Also he is a cofounder of Ask Senior, a platform to guide college students for competitive programming.",
+    isRevealed: true,
+  },
   null, // Placeholder for speaker 3
 ]
 
