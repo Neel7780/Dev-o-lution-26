@@ -1,6 +1,7 @@
 # DEVOLUTION 2026
 
 The official website for DEVOLUTION 2026 - DSC DAU's (formerly GDG on Campus DAU) flagship tech event where coding meets chaos and creativity.
+jfjdjd
 
 ## About
 
