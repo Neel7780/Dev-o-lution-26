@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { HelpCircle, Lock, Eye, EyeOff } from "lucide-react"
@@ -15,6 +15,7 @@ type Speaker = {
   talkTitle?: string
   intro?: string
   isRevealed: boolean
+  isGDE?: boolean
 }
 
 const speakers: (Speaker | null)[] = [
@@ -25,6 +26,7 @@ const speakers: (Speaker | null)[] = [
     talkTitle: "The Dynamic Duo: Introduction to Modern App Development with Flutter & Firebase",
     intro: "Abhishek Doshi is a Google Developer Expert for Dart, Flutter & Firebase with over 7+ years of experience in app development, currently working as Tech Lead at a US-based health-tech company as well as Founder of Zeth Technologies",
     isRevealed: true,
+    isGDE: true,
   },
   {
     name: "Vaibhav Malpani",
@@ -33,6 +35,7 @@ const speakers: (Speaker | null)[] = [
     talkTitle: "Intro to AI agents and ADK",
     intro: "Vaibhav Malpani is Technical Lead at Incedo Inc. with 9+ years of expertise working with Cloud Technologies. He is also a Google developer expert in GCP. He like to write blogs on medium and share his knowledge in such events.",
     isRevealed: true,
+    isGDE: true,
   },
   {
     name: "Jaskaran Singh",
@@ -62,6 +65,12 @@ export function SpeakersSection() {
   const cardsRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLParagraphElement>(null)
   const glitchTextRefs = useRef<(HTMLSpanElement | null)[]>([])
+  const [activeCardIndex, setActiveCardIndex] = useState<number | null>(null)
+
+  // Handle card click for mobile
+  const handleCardClick = (index: number) => {
+    setActiveCardIndex(activeCardIndex === index ? null : index)
+  }
 
   useEffect(() => {
     if (!sectionRef.current) return
@@ -296,48 +305,32 @@ export function SpeakersSection() {
           </h2>
         </div>
 
-        {/* Top Secret Badge */}
+        {/* Top Secret Badge */}  
         <div
           ref={badgeRef}
           className="absolute top-24 md:top-32 right-4 md:right-20 z-20"
         >
-          <div className="bg-red-600 text-white border-4 border-red-800 px-4 md:px-6 py-2 md:py-3 brutal-shadow -rotate-12 relative overflow-hidden">
-            {/* Animated stripe */}
-            <div
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.2) 10px, rgba(0,0,0,0.2) 20px)",
-                animation: "stripe-move 1s linear infinite",
-              }}
-            />
-            <div className="flex items-center gap-2 relative">
-              <Lock className="w-5 h-5 md:w-6 md:h-6 animate-pulse" />
-              <span className="font-(--font-display) text-lg md:text-2xl font-black uppercase tracking-wider">
-                Top Secret
-              </span>
-            </div>
-            <span className="text-xs md:text-sm font-bold uppercase tracking-wider relative">
-              Classified • TBA
-            </span>
-          </div>
+          
         </div>
 
         {/* Speaker Cards Grid */}
         <div ref={cardsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {speakers.map((speaker, index) => {
             const isRevealed = speaker?.isRevealed ?? false
+            const isActive = activeCardIndex === index
             
             return (
               <div
                 key={index}
-                className="speaker-card bg-white border-[3px] border-black p-3 brutal-shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#000] group relative overflow-hidden"
+                className="speaker-card bg-white border-[3px] border-black p-3 brutal-shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#000] group relative overflow-hidden cursor-pointer"
                 style={{
                   transform: `rotate(${(index - 1.5) * 1.5}deg)`,
                 }}
                 data-magnetic="0.1"
+                onClick={() => handleCardClick(index)}
               >
                 {/* Content wrapper that gets blurred on hover */}
-                <div className={`relative transition-all duration-300 ${isRevealed && speaker?.intro ? 'group-hover:blur-[4px]' : ''}`}>
+                <div className={`relative transition-all duration-300 ${isRevealed && speaker?.intro ? (isActive ? 'blur-[4px]' : 'group-hover:blur-[4px]') : ''}`}>
                   {/* Hover glitch effect overlay */}
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-fuchsia-500/0 to-yellow-500/0 group-hover:from-cyan-500/10 group-hover:via-fuchsia-500/10 group-hover:to-yellow-500/10 transition-all duration-300 z-10" />
 
@@ -361,10 +354,12 @@ export function SpeakersSection() {
                         className="object-cover"
                         sizes="(max-width: 768px) 50vw, 25vw"
                       />
-                      {/* GDE Badge overlay */}
-                      <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 border-2 border-black brutal-shadow text-xs font-black uppercase z-20">
-                        GDE
-                      </div>
+                      {/* GDE Badge overlay - only show if speaker is a GDE */}
+                      {speaker.isGDE && (
+                        <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 border-2 border-black brutal-shadow text-xs font-black uppercase z-20">
+                          GDE
+                        </div>
+                      )}
                     </>
                   ) : (
                     <>
@@ -421,7 +416,7 @@ export function SpeakersSection() {
 
                 {/* Intro overlay - shows on hover for revealed speakers */}
                 {isRevealed && speaker?.intro && (
-                  <div className="absolute inset-0 bg-white z-50 p-4 md:p-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
+                  <div className={`absolute inset-0 bg-white z-50 p-4 md:p-5 flex items-center justify-center transition-opacity duration-300 pointer-events-none ${isActive ? 'opacity-100 pointer-events-auto' : 'opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto'}`}>
                     <div className="border-[3px] border-black p-4 md:p-5 w-full h-full flex items-center justify-center">
                       <p className="text-xs md:text-sm font-semibold text-black leading-relaxed text-center">
                         {speaker.intro}
