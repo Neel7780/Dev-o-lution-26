@@ -44,7 +44,7 @@ const speakers: (Speaker | null)[] = [
   },
   {
     name: "Vishal Patel",
-    photo: "/current-chapter/speaker-images/Vishal_Patel.jpeg",
+    photo: "/current-chapter/speaker-images/vishal_patel.jpeg",
     position: "Expertise in AI, Data Engineering and Google Cloud",
     talkTitle: "Magic of AI with Context and Memory",
     intro: "Vishal Patel has over 15 years of experience in the technology sector. He was the Ex-Vice President of ViitorCloud Technologies and have expertise in AI, Data Engineering and Google Cloud. He is an OpenSource Enthusiast.",
