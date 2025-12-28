@@ -42,7 +42,14 @@ const speakers: (Speaker | null)[] = [
     intro: "Jaskaran Singh is an ICPC World Finalist 2023 and also currently working as Software Engineer at Google. He have a keen interest in competitive programming and have gained immense experience over the years. Also he is a cofounder of Ask Senior, a platform to guide college students for competitive programming.",
     isRevealed: true,
   },
-  null, // Placeholder for speaker 4
+  {
+    name: "Vishal Patel",
+    photo: "/current-chapter/speaker-images/Vishal_Patel.jpeg",
+    position: "Expertise in AI, Data Engineering and Google Cloud",
+    talkTitle: "Magic of AI with Context and Memory",
+    intro: "Vishal Patel has over 15 years of experience in the technology sector. He was the Ex-Vice President of ViitorCloud Technologies and have expertise in AI, Data Engineering and Google Cloud. He is an OpenSource Enthusiast.",
+    isRevealed: true,
+  },
 ]
 
 // Glitch text characters for mystery effect
