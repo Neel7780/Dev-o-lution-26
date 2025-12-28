@@ -53,6 +53,14 @@ const speakers: (Speaker | null)[] = [
     intro: "Vishal Patel has over 15 years of experience in the technology sector. He have expertise in AI, Data Engineering and Google Cloud. He is an OpenSource Enthusiast.",
     isRevealed: true,
   },
+  {
+    name: "Neel Shah",
+    photo: "/current-chapter/speaker-images/neel_shah.jpeg",
+    position: "Expertise in DevOps & Cloud Infrastructure",
+    talkTitle: "Building Cloud-Native MLOps Pipeline on GCP",
+    intro: "Neel Shah is a Developer Advocate at Middleware. He has expertise in DevOps & Cloud Infrastructure. Organiser of Google Cloud Gandhinagar, CNCF Gandhinagar, Hashicorp User Group Gandhinagar and Open Source Weekend. Have mentored at 15+ hackathons and open-source programs.",
+    isRevealed: true,
+  },
 ]
 
 // Glitch text characters for mystery effect
