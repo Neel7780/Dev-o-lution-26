@@ -61,6 +61,16 @@ const speakers: (Speaker | null)[] = [
     intro: "Neel Shah is a Developer Advocate at Middleware. He has expertise in DevOps & Cloud Infrastructure. Organiser of Google Cloud Gandhinagar, CNCF Gandhinagar, Hashicorp User Group Gandhinagar and Open Source Weekend. Have mentored at 15+ hackathons and open-source programs.",
     isRevealed: true,
   },
+  {
+    name: "Jay Thakkar",
+    photo: "/current-chapter/speaker-images/jay_thakkar.jpg",
+    position: "Google Developer Expert (GDE) in AI/ML",
+    talkTitle: "How to build and ship full stack apps using Antigravity and Gemini 3",
+    intro: "Jay Thakkar is a passionate Researcher in the field of AI and ML. As the Community Lead at TensorFlow User Groups Surat, he have orchestrated technical training sessions for over 500 developers, demonstrating his passion for knowledge dissemination and community development within the AI and tech sphere.",
+    isRevealed: true,
+  },
+  null,
+  null,
 ]
 
 // Glitch text characters for mystery effect
