@@ -83,7 +83,7 @@ const speakers: (Speaker | null)[] = [
     photo: "/current-chapter/speaker-images/Ravi_rupareliya.jpg",
     position: "Expertise in Android and Firebase",
     talkTitle: "Building Flutter Faster with AI: From Idea to App",
-    intro: "Ravi Rupareliya is a tech leader with 13+ years of experience in building scalable mobile and web applications. Ravi has led multiple projects combining mobile frontends with cloud-native backends, empowering teams to build production-grade solutions. He is passionate about bridging mobile development with Google cloud's capabilities and helping developers leverage modern tools to build intelligent, scalable and reliable application.",
+    intro: "Ravi Rupareliya is a tech leader with 13+ years of experience in building scalable mobile and web applications. He has led multiple projects combining mobile frontends with cloud-native backends, empowering teams to build production-grade solutions. He also has a 35k+ Reputation on Stackoverflow.",
     isRevealed: true,
   },
   null,
