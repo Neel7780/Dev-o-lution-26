@@ -94,6 +94,14 @@ const speakers: (Speaker | null)[] = [
     intro: "Drijesh Patel is a Software Development Manager at IBM with having expertise in cybersecurity and generative AI. As a Cybersecurity Engineering Manager for QRadar at IBM, he led teams to deliver AI-powered, secure, and scalable solutions that drive real-world impact. Delivered over 300+ talks.",
     isRevealed: true,
   },
+  {
+    name: "Shruti Mishra",
+    photo: "/current-chapter/speaker-images/shruti_mishra.jpg",
+    position: "Expertise in Machine Learning, Generative AI and Cloud",
+    talkTitle: "Getting Started with Gemini, Web, and Cloud  and Career Opportunities",
+    intro: "Shruti Mishra is a Lecturer at P. P. Savani University with a strong focus on applied Artificial Intelligence, Machine Learning, and Generative AI. She actively bridges academic foundations with real-world industry use cases, modern development practices, and cloud-based AI solutions.",
+    isRevealed: true,
+  },
   null,
   null,
 ]
