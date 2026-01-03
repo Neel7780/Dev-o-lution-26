@@ -119,7 +119,14 @@ const speakers: (Speaker | null)[] = [
     intro: "Jaydeep Adesara is an AI automation specialist and Founder & CEO of Conversantech, focused on replacing manual work with AI agents. With 10+ years building scalable systems, he helps developers leverage automation to build better products faster. Organiser of FlutterFlow Developer Group Rajkot and shares practical insights as a public speaker.",
     isRevealed: true,
   },
-  null,
+  {
+    name: "Gauri Yadav",
+    photo: "/current-chapter/speaker-images/gauri_yadav.jpeg",
+    position: "Expertise in DevOps, Docker and Google Cloud Platform (GCP)",
+    talkTitle: "Engineering the Future: Cloud-Native AI",
+    intro: "Gauri Yadav is the Founder of AILINESTUDIO, a Docker Captain, and a strong advocate for Women in Tech with a growing community of 30K+ learners and professionals. She specializes in simplifying complex cloud, DevOps, and security concepts through real-world examples and practical storytelling. She regularly speaks at tech communities, workshops, and conferences.",
+    isRevealed: true,
+  },
 ]
 
 // Glitch text characters for mystery effect
