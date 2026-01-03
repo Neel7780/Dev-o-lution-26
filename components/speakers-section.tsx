@@ -124,7 +124,7 @@ const speakers: (Speaker | null)[] = [
     photo: "/current-chapter/speaker-images/gauri_yadav.jpeg",
     position: "Expertise in DevOps, Docker and Google Cloud Platform (GCP)",
     talkTitle: "Engineering the Future: Cloud-Native AI",
-    intro: "Gauri Yadav is the Founder of AILINESTUDIO, a Docker Captain, and a strong advocate for Women in Tech with a growing community of 30K+ learners and professionals. She specializes in simplifying complex cloud, DevOps, and security concepts through real-world examples and practical storytelling. She regularly speaks at tech communities, workshops, and conferences.",
+    intro: "Gauri Yadav is the Founder of AILINESTUDIO, a Docker Captain, and a strong advocate for Women in Tech with a growing community of 30K+ learners and professionals. She specializes in simplifying complex cloud, DevOps, and security concepts through real-world examples and practical storytelling. She regularly speaks at tech communities and conferences.",
     isRevealed: true,
   },
 ]
