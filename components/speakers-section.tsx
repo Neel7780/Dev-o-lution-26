@@ -132,6 +132,15 @@ const speakers: (Speaker | null)[] = [
 // Glitch text characters for mystery effect
 const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`"
 
+// Community partners (moved here from Partner-with-us)
+const communityPartners = [
+  {
+    name: "Ask Senior",
+    logo: "/asksenior.jpeg",
+    description: "Platform to guide college students for competitive programming",
+  },
+]
+
 export function SpeakersSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const headingRef = useRef<HTMLDivElement>(null)
@@ -379,6 +388,8 @@ export function SpeakersSection() {
           </h2>
         </div>
 
+        
+
         {/* Top Secret Badge */}  
         <div
           ref={badgeRef}
@@ -397,9 +408,7 @@ export function SpeakersSection() {
               <div
                 key={index}
                 className="speaker-card bg-white border-[3px] border-black p-3 brutal-shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_#000] group relative overflow-hidden cursor-pointer"
-                style={{
-                  transform: `rotate(${(index - 1.5) * 1.5}deg)`,
-                }}
+                // no initial rotation — keep cards straight on load
                 data-magnetic="0.1"
                 onClick={() => handleCardClick(index)}
               >
@@ -502,6 +511,34 @@ export function SpeakersSection() {
             )
           })}
         </div>
+
+        {/* Community Partners - placed after the speaker cards */}
+        {communityPartners.length > 0 && (
+          <div className="mt-8 mb-12 md:mb-16">
+            <div className="text-center mb-6">
+              <h3 className="font-(--font-display) text-2xl md:text-3xl uppercase font-black mb-2">Community Partners</h3>
+              <p className="text-sm md:text-base text-black/70">Proudly supported by our community partners</p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto">
+              {communityPartners.map((partner, idx) => (
+                <div
+                  key={idx}
+                  className="group bg-white border-[3px] border-black p-3 md:p-4 brutal-shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000] relative overflow-hidden"
+                  style={{ transform: "none" }}
+                >
+                  <div className="aspect-square bg-gradient-to-br from-black/5 to-black/10 border-2 border-black flex items-center justify-center mb-2 relative overflow-hidden">
+                    <Image src={partner.logo} alt={partner.name} fill className="object-contain p-3" sizes="(max-width: 768px) 50vw, 25vw" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-(--font-display) text-xs md:text-sm font-black uppercase text-black mb-1 group-hover:text-cyan-600 transition-colors">{partner.name}</p>
+                    <p className="text-[10px] md:text-xs font-semibold text-black/70">{partner.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Bottom Text */}
         <p
